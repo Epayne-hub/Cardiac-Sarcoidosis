@@ -1,0 +1,611 @@
+---
+title: "Fibroblast GSEA Nature validation"
+author: "EP"
+date: "2025-10-04"
+output: html_document
+---
+
+```{r setup, include = FALSE, fig.path = "custom/path", warning = FALSE, message = FALSE}
+
+options (width = 100)
+knitr::opts_chunk$set(warning = FALSE, echo = TRUE, message = FALSE, dev = c("png", "pdf"))
+seed <- 1234
+
+```
+
+
+```{r load libraries, echo = F}
+
+suppressPackageStartupMessages({
+  library(Seurat)
+  library(ggpubr)
+  library(pheatmap)
+  library(SingleCellExperiment)
+  library(dplyr)
+  library(tidyverse)
+  library(viridis)
+  library(muscat)
+  library(circlize)
+  library(destiny)
+  library(scater)
+  library(metap)
+  library(multtest)
+  library(clusterProfiler)
+  library(org.Hs.eg.db)
+  library(msigdbr)
+  library(enrichplot)
+  library(DOSE)
+  library(grid)
+  library(gridExtra)
+  library(ggupset)
+  library(VennDiagram)
+  library(NCmisc)
+  library(RColorBrewer)
+  library(EnhancedVolcano)
+  library(textshaping)
+  library(wordcloud)
+  library(pathview)
+  library(workflowr)
+  library(future)
+})
+
+```
+
+
+
+
+```{r, echo = FALSE}
+seuratM <- readRDS("~/Documents/Github/Cardiac Sarcoidosis/data/Merged/Sarcoidosis_vs_DonorHeart_v2.rds")
+"data/Merged/Sarcoidosis_vs_DonorHeart_v2.rds"
+
+```
+
+
+```{r, echo = FALSE, warning = FALSE}
+
+seuratM <- subset (seuratM, clusterName %in% c("CM", "Fb1","PeriFb", "VSMC", "BEC1","BEC2", "NC1", "TRM", "inflMph","Lymphocytes"))
+
+table(seuratM$orig.ident)
+```
+
+
+
+## UMAP
+```{r}
+
+colclusterName <- c("#f4a582", "#FEE08B", "#3288BD", "#253494",  "#01665e", "#66C2A5", "#355C7D", "#a6bddb", "#fde0dd", "#dd1c77")
+
+names(colclusterName) <- c("CM", "Fb1","PeriFb", "VSMC", "BEC1","BEC2", "NC1", "TRM", "inflMph","Lymphocytes")
+
+seuratM$clusterName <- factor(seuratM$clusterName, levels=c("CM", "Fb1", "PeriFb", "VSMC", "BEC1","BEC2", "NC1", "TRM", "inflMph","Lymphocytes"))
+
+Idents(seuratM) <- seuratM$clusterName
+DimPlot(seuratM, reduction = "umap",label = TRUE, cols = colclusterName, repel = TRUE, pt.size = 0.01)
+
+
+```
+
+
+```{r}
+
+seuratFb <- subset (seuratM, clusterName %in% c("Fb1", "PeriFb", "VSMC"))
+
+table(seuratFb$orig.ident)
+
+table(seuratFb$pat_sub)
+
+```
+
+
+## Reembedding
+```{r, echo = F, include = F}
+
+seuratFb <- NormalizeData (object = seuratFb)
+seuratFb <- FindVariableFeatures(object = seuratFb)
+seuratFb <- ScaleData(object = seuratFb, verbose = TRUE)
+seuratFb <- RunPCA(object = seuratFb, npcs = 30, verbose = FALSE)
+seuratFb <- RunTSNE(object = seuratFb, reduction="pca", dims = 1:20)
+seuratFb <- RunUMAP(object = seuratFb, reduction="pca", dims = 1:20)
+seuratFb <- FindNeighbors(object = seuratFb, reduction = "pca", dims= 1:20)
+
+res <- c(0.1, 0.15, 0.2, 0.25, 0.6, 0.8, 0.4, 0.3)
+for (i in 1:length(res)) {
+  seuratFb <- FindClusters(object = seuratFb, resolution = res[i], random.seed = 1234)
+}
+
+table(seuratFb$orig.ident)
+table(seuratFb$clusterName)
+
+```
+
+
+
+```{r, echo = FALSE, include = F}
+FindAllMarkers(seuratFb, only.pos = TRUE)
+
+
+Idents(seuratFb) <- seuratFb$RNA_snn_res.0.25
+
+DEGenesFb <- FindAllMarkers(seuratFb, only.pos = T)  %>% dplyr::filter(p_val_adj < 0.01)
+
+
+DEGenesFb <- DEGenesFb %>% 
+  mutate(Gene=gene) %>%
+  mutate(gene=gsub("^.*\\.", "", Gene))  %>%
+  mutate(EnsID=gsub("\\..*","", Gene))
+
+#View(DEGenesFb)
+
+```
+
+
+```{r, echo = F, include = F}
+
+Idents (seuratFb) <- seuratFb$RNA_snn_res.0.1
+DimPlot(seuratFb, reduction = "umap", pt.size = 0.1, label = TRUE)
+
+Idents (seuratFb) <- seuratFb$RNA_snn_res.0.15
+DimPlot(seuratFb, reduction = "umap", pt.size = 0.1, label = TRUE)
+
+Idents (seuratFb) <- seuratFb$RNA_snn_res.0.2
+DimPlot(seuratFb, reduction = "umap", pt.size = 0.1, label = TRUE)
+
+Idents (seuratFb) <- seuratFb$RNA_snn_res.0.25
+
+DimPlot(seuratFb, reduction = "umap", pt.size = 0.1, label = TRUE)
+
+Idents (seuratFb) <- seuratFb$RNA_snn_res.0.3
+
+DimPlot(seuratFb, reduction = "umap", pt.size = 0.1, label = TRUE)
+
+Idents (seuratFb) <- seuratFb$RNA_snn_res.0.4
+
+DimPlot(seuratFb, reduction = "umap", pt.size = 0.1, label = TRUE)
+
+Idents (seuratFb) <- seuratFb$RNA_snn_res.0.6
+
+DimPlot(seuratFb, reduction = "umap", pt.size = 0.1, label = TRUE)
+
+Idents (seuratFb) <- seuratFb$RNA_snn_res.0.8
+DimPlot(seuratFb, reduction = "umap", pt.size = 0.1, label = TRUE) +
+  theme_bw() +
+  theme(axis.text = element_blank(), axis.ticks = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank()) +
+  xlab("UMAP1") +
+  ylab("UMAP2") + ggtitle(paste0("Fb 0.8 res"))
+
+Idents (seuratFb) <- seuratFb$RNA_snn_res.0.3
+
+DimPlot(seuratFb, reduction = "umap", pt.size = 0.1, label = TRUE)
+
+
+```
+
+## Fibroblast annotation
+```{r}
+
+Idents (seuratFb) <- seuratFb$RNA_snn_res.0.3
+
+DimPlot(seuratFb, reduction = "umap", pt.size = 0.1, label = TRUE)
+
+seuratFb$clusterName <- "clusterName"
+Idents(seuratFb) <- seuratFb$clusterName
+seuratFb$clusterName[which(seuratFb$RNA_snn_res.0.3 %in% "0" )] <- "PeriFb1"
+seuratFb$clusterName[which(seuratFb$RNA_snn_res.0.3 %in% "1" )] <- "PDGFRAhigh Fb1"
+seuratFb$clusterName[which(seuratFb$RNA_snn_res.0.3 %in% "2" )] <- "PDGFRAlow Fb1"
+seuratFb$clusterName[which(seuratFb$RNA_snn_res.0.3 %in% "3" )] <- "PeriFb2"
+seuratFb$clusterName[which(seuratFb$RNA_snn_res.0.3 %in% "4" )] <- "VSMC"
+seuratFb$clusterName[which(seuratFb$RNA_snn_res.0.3 %in% "5" )] <- "PDGFRAlow Fb2"
+seuratFb$clusterName[which(seuratFb$RNA_snn_res.0.3 %in% "6" )] <- "PDGFRAhigh Fb2"
+seuratFb$clusterName[which(seuratFb$RNA_snn_res.0.3 %in% "7" )] <- "CD34 high Fb"
+seuratFb$clusterName[which(seuratFb$RNA_snn_res.0.3 %in% "8" )] <- "PDGFRAlow VCAN high"
+seuratFb$clusterName[which(seuratFb$RNA_snn_res.0.3 %in% "9" )] <- "PI16 high Fb"
+seuratFb$clusterName[which(seuratFb$RNA_snn_res.0.3 %in% "10" )] <- "PDGFRAlow CD81high"
+           
+
+  
+colFb <- c("#e5f5f9", "#99d8c9", "#2ca25f", "#ffffb2", "#fed976", "#feb24c", "#fdbb84","#fd8d3c", "#ef6548", "#b30000", "#7f0000")
+
+
+names(colFb) <- c("PeriFb1", "PeriFb2", "VSMC", "PDGFRAhigh Fb1", "PDGFRAhigh Fb2", "PDGFRAlow Fb1", "PDGFRAlow Fb2", "PDGFRAlow VCAN high", "PDGFRAlow CD81high",  "CD34 high Fb", "PI16 high Fb")
+  
+colpat_sub<- c("#355C7D", "#dfc27d")
+
+names(colpat_sub) <- c("DonorHeart", "Sarcoidosis")
+
+seuratFb$clusterName <- factor(seuratFb$clusterName, levels = c("PeriFb1", "PeriFb2", "VSMC", "PDGFRAhigh Fb1", "PDGFRAhigh Fb2", "PDGFRAlow Fb1", "PDGFRAlow Fb2", "PDGFRAlow VCAN high", "PDGFRAlow CD81high",  "CD34 high Fb", "PI16 high Fb"))
+
+
+Idents(seuratFb) <- seuratFb$clusterName
+DimPlot(seuratFb, reduction = "umap", cols = colFb, pt.size = 0.1, label =F)
+
+#Idents(seuratFb) <- seuratFb$clusterName
+#DimPlot(seuratFb, reduction = "umap", cols = colFb, pt.size = 0.1, label =T, repel = T)
+
+
+```
+
+
+
+```{r, include = F}
+## Create Dotplot with marker genes
+
+Idents (seuratFb) <- seuratFb$RNA_snn_res.0.3
+
+DimPlot(seuratFb, reduction = "umap", pt.size = 0.1, label = TRUE)
+
+
+genes <- data.frame(gene=rownames(seuratFb)) %>% 
+  mutate(geneID=gsub("^.*\\.", "", gene))
+
+# Selected genes for DotPlot
+selGenes <- data.frame(geneID=rev(c("COL6A3", "DCN", "PDPN", "PDGFRA","PDGFRB", "RGS5", "NOTCH3", "MYH11", "ACTA2","PECAM1", "VWF", "NCAM1", "CD34", "CD81", "SCARA5", "SOX6", "IL33",  "BMP5", "BMP4", "TAGLN", "COL4A5", "SMOC2", "VCAN", "TMEM178A",	"PI16", "SFRP1", "CLEC3B", "FBLN1", "C4BPA","P2RX1", "ITGA8", "FGFR2", "CPXM1", "CCDC80", "LGI2", "OGN",  "TIMP1", "PTN", "POSTN", "PLP1", "LGI4", "CRYAB"))) %>% left_join(., genes, by="geneID") %>% filter(gene != "ENSG00000232995.RGS5") 
+                                    
+DotPlot(seuratFb, features = selGenes$gene) + RotatedAxis() + scale_color_viridis(option="T") + coord_flip()
+
+#DotPlot(seuratFb, features = selGenes$gene, group.by= "clusterName") + RotatedAxis() + scale_color_viridis(option="T") + coord_flip()
+
+```
+
+
+
+
+```{r, echo = F, include =F}
+library(tibble)
+library(tidyr)
+library(circlize)
+library(magrittr)
+
+Remove_ensebl_id <- function(data_conv){
+  data_conv <- as.SingleCellExperiment(data_conv, assay = "RNA")
+  
+  gene_name_fixdf <- data.frame(Gene_Name = rownames(data_conv))
+  gene_name_fixdf$Symbol <- gsub("^[^.]*.","", gene_name_fixdf$Gene_Name)
+  
+  
+  duplidx <- rownames((gene_name_fixdf[duplicated(gene_name_fixdf$Symbol), ]))
+  
+  while (length(duplidx)>0){
+    Fixed_dupl <- gene_name_fixdf %>% 
+      filter(row_number() %in% duplidx)  %>% 
+      mutate(Symbol = paste0(Symbol, ".4"))
+    gene_name_fixdf[duplidx,"Symbol"] <- Fixed_dupl$Symbol
+    rownames(data_conv) <- gene_name_fixdf$Symbol
+    duplidx <- rownames((gene_name_fixdf[duplicated(gene_name_fixdf$Symbol), ]))
+  }
+  
+  # Convert SingleCellexperiment object back to seurat object by retaining the reductions, normalization, etc
+  data_conv <- as.Seurat(data_conv, assay = NULL)
+  return(data_conv)
+}
+```
+
+
+
+## Dotplot with marker genes
+```{r, echo = F, fig.height = 7}
+
+seuratFb_conv <- seuratFb
+data_conv <-Remove_ensebl_id(seuratFb_conv)
+
+Idents(data_conv) <- data_conv$clusterName
+
+levels(data_conv)<-levels(data_conv)[order(match(levels(data_conv),c("PeriFb1", "PeriFb2", "VSMC", "PDGFRAhigh Fb1", "PDGFRAhigh Fb2", "PDGFRAlow Fb1", "PDGFRAlow Fb2", "PDGFRAlow VCAN high", "PDGFRAlow CD81high",  "FBN1 high Fb", "PI16 high Fb")))]
+
+order_clusters <- c("PeriFb1", "PeriFb2", "VSMC", "PDGFRAhigh Fb1", "PDGFRAhigh Fb2", "PDGFRAlow Fb1", "PDGFRAlow Fb2", "PDGFRAlow VCAN high", "PDGFRAlow CD81high",  "CD34 high Fb", "PI16 high Fb")
+
+data_conv$clusterName <- factor(data_conv$clusterName, levels = order_clusters)
+
+
+#gene_list <- c("IL1B", "OSM", "IL1RL1", "IL33", "OSMR", "LIFR",  "IL6ST", "IL1R1", "IL1RAP", "CCL11"))
+
+
+gene_list <- rev(c("PDGFRB", "RGS5", "BMP5", "NOTCH3", "MYH11", "ACTA2", "ITGA8", "PDPN", "PDGFRA", "SOX6", "CCDC80","DCN", "VCAN", "FBN1","COL6A1","PTN", "TIMP1", "OGN","CD81", "POSTN", "CD34", "SMOC2",	"PI16", "TMEM178A"))
+
+
+##gene_list <- rev(c("PDGFRB", "RGS5", "BMP5", "NOTCH3", "MYH11", "ACTA2", "ITGA8", "LGI4", "TAGLN", "PDPN", "PDGFRA", #"SOX6", "CCDC80","DCN", "VCAN", "FBN1","COL6A1", "PTN", "OGN","CD81", "TIMP1", "CLEC3B", "C4BPA","POSTN", "PLP1",  #"CRYAB", "CD34","SMOC2",	"PI16", "TMEM178A", "P2RX1",  "FGFR2", "CPXM1", "SFRP1"))
+
+
+seuratM$clusterName <- factor(seuratM$clusterName, levels = c("PeriFb1", "PeriFb2", "VSMC", "PDGFRAhigh Fb1", "PDGFRAhigh Fb2", "PDGFRAlow Fb1", "PDGFRAlow Fb2", "PDGFRAlow VCAN high", "PDGFRAlow CD81high",  "CD34 high Fb", "PI16 high Fb"))
+
+
+DotPlot(data_conv, features = gene_list, group.by= "clusterName") + RotatedAxis() + scale_color_viridis(option="F") + coord_flip() + ggtitle("Celltype assignment" + theme(axis.text.y = element_text(size = 10)))
+
+
+```
+
+## Dotplot with Genes from Nature paper IL33 feedforward
+```{r}
+
+gene_list <- rev(c("IL33","LIFR", "OSMR", "IL1R1",  "IL6ST", "IL1RAP", "CCL11", "IL1B", "OSM", "IL1RL1"))
+
+seuratM$clusterName <- factor(seuratM$clusterName, levels = c("PeriFb1", "PeriFb2", "VSMC", "PDGFRAhigh Fb1", "PDGFRAhigh Fb2", "PDGFRAlow Fb1", "PDGFRAlow Fb2", "PDGFRAlow VCAN high", "PDGFRAlow CD81high",  "CD34 high Fb", "PI16 high Fb"))
+
+
+DotPlot(data_conv, features = gene_list, group.by= "clusterName") + RotatedAxis() + scale_color_viridis(option="T") + coord_flip() + ggtitle("Celltype assignment" + theme(axis.text.y = element_text(size = 10)))
+
+
+```
+
+
+## Violin Plots (VlnPlots) Il33 and OSMR
+```{r}
+
+
+VlnPlot(seuratFb, features = "ENSG00000137033.IL33", pt.size = 0.5, group.by ="clusterName") + scale_fill_manual(values = colFb) + ggtitle ("IL33")
+
+VlnPlot(seuratFb, features = "ENSG00000145623.OSMR", pt.size = 0.5, group.by ="clusterName") + scale_fill_manual(values = colFb) + ggtitle ("OSMR")
+
+VlnPlot(seuratFb, features = "ENSG00000137033.IL33", pt.size = 0.5, group.by ="clusterName") +
+  scale_fill_manual(values = colFb) + ggtitle ("IL33")
+
+VlnPlot(seuratFb, features = "ENSG00000113594.LIFR", pt.size = 0.5, group.by ="clusterName") +
+  scale_fill_manual(values = colFb) + ggtitle ("LIFR")
+
+VlnPlot(seuratFb, features = "ENSG00000134352.IL6ST", pt.size = 0.5, group.by ="clusterName") +
+  scale_fill_manual(values = colFb) + ggtitle ("IL6ST")
+
+VlnPlot(seuratFb, features = "ENSG00000115594.IL1R1", pt.size = 0.5, group.by ="clusterName") +
+  scale_fill_manual(values = colFb) + ggtitle ("IL1R1")
+
+VlnPlot(seuratFb, features = "ENSG00000196083.IL1RAP", pt.size = 0.5, group.by ="clusterName") +
+  scale_fill_manual(values = colFb) + ggtitle ("IL1RAP")
+
+VlnPlot(seuratFb, features = "ENSG00000172156.CCL11", pt.size = 0.5, group.by ="clusterName") +
+  scale_fill_manual(values = colFb) + ggtitle ("CCL11")
+
+```
+
+VlnPlots BMP Family
+```{r}
+
+genes <- data.frame(gene=rownames(seuratFb)) %>% 
+  mutate(geneID=gsub("^.*\\.", "", gene))
+
+selGenes <- data.frame(geneID=c("HGF", "MET", "GREM1", "GREM2", "BMPR1A", "BMPR2", "BMP2K", "BMP8A", "BMP1", "BMP6", "BMP2", "BMP4", "BMP5", "BMP7")) %>% 
+  left_join(., genes, by="geneID")
+
+Idents(seuratFb) <- seuratFb$clusterName
+pList <- sapply(selGenes$gene, function(x){
+  p <- VlnPlot( object = seuratFb, features = x, pt.size = 0.5, cols=colFb)
+  plot(p)
+})
+
+
+```
+
+
+
+## Relative abundance of fibroblasts per condition
+```{r}
+
+datList <- NULL
+for(con in unique(seuratFb$pat_sub)){
+  seuratSub <- subset(seuratFb, pat_sub==con)
+  print(dim(seuratSub))
+  dat_con <- as.data.frame(table(seuratSub$clusterName)) %>%
+  mutate(percent=Freq/ncol(seuratSub)) %>% mutate(diseaseCond=con)
+  datList[[con]] <- dat_con
+  
+}
+
+dat_all <- do.call("rbind", datList)
+
+order_patsub <- c("DonorHeart", "Sarcoidosis")
+
+ggbarplot(dat_all, x = "diseaseCond", y = "percent", fill = "Var1", palette = colFb, legend = "right", legend.titel = "cluster", xlab = "condition", ylab = "frequency") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  scale_x_discrete(limits = order_patsub)
+
+
+```
+
+## Relative abundance of fibroblasts per patient
+```{r}
+
+datList <- NULL
+for(con in unique(seuratFb$patient)){
+  seuratFbSub <- subset(seuratFb, patient==con)
+  print(dim(seuratFbSub))
+  dat_con <- as.data.frame(table(seuratFbSub$clusterName)) %>%
+  mutate(percent=Freq/ncol(seuratFbSub)) %>% mutate(patient=con)
+  datList[[con]] <- dat_con
+}
+
+
+dat_all <- do.call("rbind", datList)
+
+#head(dat_all)
+
+patient_order <- c("Donor Heart 01", "Donor Heart 02", "Donor Heart 03", "Donor Heart 04", "Donor Heart 05", "Donor Heart 06", "Donor Heart 07", "Donor Heart 08", "Donor Heart 09", "Donor Heart 10", "Donor Heart 11", "Sarcoidosis 01", "Sarcoidosis 02", "Sarcoidosis 03", "Sarcoidosis 04", "Sarcoidosis 05")
+
+#View(dat_all)
+
+#write.table(dat_all, file= "~/Documents/01 Projects/00 snRNAseq/01 Myocarditis snRNAseq/docs/Markers", sep = "\t",quote=F,row.names=T,col.names=T)
+
+
+dat_all$patient <- factor(dat_all$patient, levels = patient_order)
+
+ggbarplot(dat_all, x= "patient", y= "percent", fill = "Var1", legend = "right", legend.titel = "cluster", ylab = "frequency", palette = colFb)  + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+
+```
+
+## Fb Counts
+```{r}
+
+## total Fb count for all conditions
+table(seuratFb$orig.ident)
+
+## Clusters per condition
+table(seuratFb$clusterName, seuratFb$pat_sub)
+
+
+```
+
+## Fb subtype relative abundance per condition
+```{r}
+
+seuratFb$pat_sub <- factor(seuratFb$pat_sub, levels = c("DonorHeart", "Sarcoidosis"))
+
+
+colpat_sub <- c("DonorHeart" = "#355C7D", "Sarcoidosis" = "#dfc27d")
+
+
+dat_counts <- seuratFb@meta.data %>%
+  group_by(patient_pat_sub, pat_sub, clusterName) %>%
+  summarise(cnt = n(), .groups = "drop")
+
+dat_totals <- seuratFb@meta.data %>%
+  group_by(patient_pat_sub) %>%
+  summarise(total_cells = n(), .groups = "drop")
+
+dat_rel <- dat_counts %>%
+  left_join(dat_totals, by = "patient_pat_sub") %>%
+  mutate(rel_abundance = cnt / total_cells)
+
+
+pvals <- dat_rel %>%
+  group_by(clusterName) %>%
+  summarise(p_val = wilcox.test(rel_abundance ~ pat_sub)$p.value) %>%
+  mutate(p_label = sprintf("p = %.3f", p_val))
+
+
+y_max <- dat_rel %>% 
+  group_by(clusterName) %>%
+  summarise(y_pos = max(rel_abundance))
+
+
+pvals <- left_join(pvals, y_max, by = "clusterName")
+
+
+ggbarplot(dat_rel,
+          x = "clusterName",
+          y = "rel_abundance",
+          fill = "pat_sub",
+          palette = colpat_sub,
+          add = c("mean_se"),
+          position = position_dodge(0.8),
+          xlab = "Cluster (Cell type)",
+          ylab = "Relative abundance",
+          legend.title = "Condition") +
+  
+  theme_classic() + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  
+  ggrepel::geom_text_repel(data = pvals, aes(x = clusterName, y = y_pos * 1.05, label = p_label), inherit.aes = FALSE,
+size = 3, direction = "y",nudge_y = 0.01, segment.size = 0.2, box.padding = 0.5, point.padding = 0.5)
+
+
+ 
+```
+
+## Fb Feature Plots
+```{r, include = F}
+
+Idents(seuratFb) <- seuratFb$clusterName
+DimPlot(seuratFb, reduction = "umap",label = F, cols = colclusterName, repel = TRUE, pt.size = 0.01)
+
+get_full_gene_name <- function(gene, obj){
+  return(grep(gene,rownames(obj), value =TRUE))
+}
+
+get_full_gene_name("OSM",seuratFb) 
+
+
+FeaturePlot(seuratFb, features = "ENSG00000197461.PDGFA", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratFb, features = "ENSG00000113721.PDGFRB", pt.size = 1, cols = c("lightgrey", "#BE3144")) 
+FeaturePlot(seuratFb, features = "ENSG00000164692.COL1A2", pt.size = 1, cols = c("lightgrey", "#BE3144")) # Fibroblast
+FeaturePlot(seuratFb, features = "ENSG00000142173.COL6A2", pt.size = 1, cols = c("lightgrey", "#BE3144")) # Fibroblast
+FeaturePlot(seuratFb, features = get_full_gene_name("COL4A4",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratFb, features = get_full_gene_name("FCGR1A",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratFb, features = "ENSG00000107796.ACTA2", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratFb, features = "ENSG00000135424.ITGA7", pt.size = 1, cols = c("lightgrey", "#BE3144")) # 
+FeaturePlot(seuratFb, features = "ENSG00000143248.RGS5", pt.size = 1, cols = c("lightgrey", "#BE3144")) # Perivasc Fibroblast
+FeaturePlot(seuratFb, features = "ENSG00000110799.VWF", pt.size = 1, cols = c("lightgrey", "#BE3144")) # ECs
+FeaturePlot(seuratFb, features = "ENSG00000179776.CDH5", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratFb, features = "ENSG00000174059.CD34", pt.size = 1, cols = c("lightgrey", "#BE3144")) # endothelial cells
+FeaturePlot(seuratFb, features = get_full_gene_name("ITGA7",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratFb, features = get_full_gene_name("ITGA1",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))
+
+FeaturePlot(seuratFb, features = "ENSG00000011465.DCN", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+
+FeaturePlot(seuratFb, features = "ENSG00000175084.DES", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratFb, features = "ENSG00000133110.POSTN", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+
+
+```
+
+
+```{r, echo = F}
+
+genes <- data.frame(gene=rownames(seuratFb)) %>% 
+  mutate(geneID=gsub("^.*\\.", "", gene))
+
+selGenes <- data.frame(geneID=c("COL6A3", "DCN", "PDPN", "PDGFRA","PDGFRB", "RGS5", "NOTCH3", "MYH11", "ACTA2","PECAM1", "CDH5","VWF", "NCAM1", "CD34", "CD81", "SCARA5", "SOX6", "CXCL14","IL33", "MEG3", "BMP5", "BMP4", "TAGLN", "COL4A5", "SMOC2", "VCAN", "TMEM178A",	"PI16", "SFRP1", "CLEC3B", "FBLN1", "C4BPA","P2RX1", "ITGA8", "FGFR2", "CPXM1", "CCDC80", "LGI2", "OGN",  "TIMP1", "PTN", "POSTN", "PLP1", "LGI4", "CRYAB")) %>% 
+  left_join(., genes, by="geneID")
+
+pList <- sapply(selGenes$gene, function(x){
+  p <- FeaturePlot(seuratFb, features = x, 
+                   reduction = "umap", pt.size = 0.1, 
+                   cols = c("lightgrey", "#BE3144"), 
+                   raster = FALSE) +
+    theme(legend.position="right")
+  plot(p)
+})
+
+```
+
+
+
+## FeaturePlots IL33 axis projected onto GSEA
+```{r}
+
+FeaturePlot(seuratFb, features = "ENSG00000145623.OSMR", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratFb, features = "ENSG00000115602.IL1RL1", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratFb, features = "ENSG00000137033.IL33", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratFb, features = "ENSG00000145623.OSMR", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratFb, features = "ENSG00000113594.LIFR", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratFb, features = "ENSG00000134352.IL6ST", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratFb, features = "ENSG00000115594.IL1R1", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratFb, features = "ENSG00000196083.IL1RAP", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratFb, features = get_full_gene_name("CCL11",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))
+
+
+```
+
+
+
+## Feature Plots of BMP Family
+```{r}
+
+genes <- data.frame(gene=rownames(seuratFb)) %>% 
+  mutate(geneID=gsub("^.*\\.", "", gene))
+
+selGenes <- data.frame(geneID=c("HGF", "MET", "GREM1", "GREM2", "BMPR1A", "BMPR2", "BMP2K", "BMP8A", "BMP1", "BMP6", "BMP2", "BMP4", "BMP5", "BMP7")) %>% 
+  left_join(., genes, by="geneID")
+
+pList <- sapply(selGenes$gene, function(x){
+  p <- FeaturePlot(seuratFb, features = x, 
+                   reduction = "umap", pt.size = 0.1, 
+                   cols = c("lightgrey", "#BE3144"), 
+                   raster = FALSE) +
+    theme(legend.position="right")
+  plot(p)
+})
+
+
+```
+
+
+
+
+
+
+```{r}
+
+sessionInfo()
+date()
+
+```
+

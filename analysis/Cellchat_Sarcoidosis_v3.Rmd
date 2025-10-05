@@ -1,0 +1,419 @@
+---
+title: "Cellchat all clusters Sarcoidosis"
+author: "Emily Payne"
+date: "2025-10-05"
+output: html_document
+---
+
+```{r setup, include = FALSE, warning = FALSE, message = FALSE}
+
+options (width = 100)
+knitr::opts_chunk$set(warning = FALSE, echo = TRUE, message = FALSE, dev = c("png", "pdf"))
+seed <- 1234
+
+```
+
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+#devtools::install_github("sqjin/CellChat")
+library(CellChat)
+library(patchwork)
+options(stringsAsFactors = FALSE)
+
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+suppressPackageStartupMessages({
+  #library(ExploreSCdataSeurat3)
+  #library(runSeurat3)
+  library(Seurat)
+  library(ggpubr)
+  library(pheatmap)
+  library(SingleCellExperiment)
+  library(dplyr)
+  library(tidyverse)
+  library(viridis)
+  library(muscat)
+  library(circlize)
+  library(destiny)
+  library(scater)
+  library(metap)
+  library(multtest)
+  library(clusterProfiler)
+  library(org.Hs.eg.db)
+  library(msigdbr)
+  library(enrichplot)
+  library(DOSE)
+  library(grid)
+  library(gridExtra)
+  library(ggupset)
+  library(VennDiagram)
+  library(NCmisc)
+  library(RColorBrewer)
+  library(EnhancedVolcano)
+  library(textshaping)
+  library(wordcloud)
+  library(pathview)
+  library(workflowr)
+  library(CellChat)
+  library(patchwork)
+  options(stringsAsFactors = FALSE)
+})
+
+
+```
+
+
+
+
+```{r, echo = FALSE}
+
+#convert to sce to change rownames
+
+colclusterName <- c("#f4a582", "#FEE08B", "#3288BD", "#253494",  "#01665e", "#66C2A5", "#355C7D", "#a6bddb", "#fde0dd", "#dd1c77")
+
+names(colclusterName) <- c("CM", "Fb1","PeriFb", "VSMC", "BEC1","BEC2", "NC1", "TRM", "inflMph","Lymphocytes")
+
+```
+
+
+
+
+```{r, echo = FALSE}
+
+cellchat <- readRDS("~/Documents/GitHub/Cardiac Sarcoidosis/data/Merged/cellchat_onlySarcoidosis_05.10.2025.rds")
+
+cellchatH <- readRDS("~/Documents/GitHub/Cardiac Sarcoidosis/data/Merged/cellchatH_onlySarcoidosis_05.10.2025.rds")
+
+```
+
+
+
+```{r, echo = F}
+df.netH <- subsetCommunication(cellchatH)
+df.net <- subsetCommunication(cellchat) #returns a data frame consisting of all the inferred cell-cell communications at the level of ligands/receptors. Set slot.name = "netP" to access the the inferred communications at the level of signaling pathways
+
+#interactions immunecells to stroma only
+#df.net <- subsetCommunication(cellchat.all) 
+#sources.use = c(1:11), targets.use = c(12:20)
+
+#df.net <- subsetCommunication(cellchat, signaling = c("LAMININ")) #gives the inferred cell-cell communications mediated by signaling LAMININ
+```
+
+
+
+```{r, echo = F}
+
+#interactions immunecells to stroma only
+#df.net <- subsetCommunication(cellchat.all) 
+#sources.use = c(1:11), targets.use = c(12:20)
+
+#df.net <- subsetCommunication(cellchat, signaling = c("LAMININ")) #gives the inferred cell-cell communications mediated by signaling LAMININ
+df.netH <- subsetCommunication(cellchatH)
+df.net <- subsetCommunication(cellchat) #returns a data frame consisting of all the inferred cell-cell communications at the level of ligands/receptors. Set slot.name = "netP" to access the the inferred communications at the level of signaling pathways
+
+
+```
+
+
+## Net Analysis
+```{r, echo = F}
+
+colclusterName <- c("#f4a582", "#FEE08B", "#3288BD", "#253494",  "#01665e", "#66C2A5", "#355C7D", "#a6bddb", "#fde0dd", "#dd1c77")
+
+names(colclusterName) <- c("CM", "Fb1","PeriFb", "VSMC", "BEC1","BEC2", "NC1", "TRM", "inflMph","Lymphocytes")
+
+
+# cellchat
+gg1 <- netAnalysis_signalingRole_scatter(cellchat, color.use = colclusterName)
+gg1
+
+# cellchat Human
+gg2 <- netAnalysis_signalingRole_scatter(cellchatH, color.use = colclusterName)
+gg2
+
+
+```
+
+## Heatmap number of interactions 
+```{r}
+
+# Heatmap
+par(mfrow=c(1,1))
+netVisual_heatmap(cellchat, color.heatmap = "Blues", color.use = colclusterName, measure = "count")
+
+```
+
+
+## Heatmap number of interactions for humans
+```{r, echo = F}
+
+
+
+groups <- levels(cellchatH@idents)
+
+# If you already have a vector of colors (same length as groups) but no names:
+# e.g., colclusterName <- c("#1f77b4","#ff7f0e",...)
+names(colclusterName) <- groups
+
+# Now plot
+par(mfrow = c(1,1))
+netVisual_heatmap(
+  cellchatH,
+  color.heatmap = "Blues",
+  color.use = colclusterName,  # now a named vector
+  measure = "count")
+
+## 
+par(mfrow=c(1,1))
+netVisual_heatmap(cellchatH, color.heatmap = "Blues", color.use = colclusterName, measure = "count")
+
+```
+## Interaction strength cellchat
+```{r }
+
+netVisual_heatmap(cellchat, color.heatmap = "Blues", color.use = colclusterName, measure = "weight")
+
+```
+
+## Interaction strength cellchat Human
+```{r }
+
+netVisual_heatmap(cellchatH, color.heatmap = "Blues", color.use = colclusterName, measure = "weight")
+
+```
+
+
+
+```{r}
+
+groupSize <- as.numeric(table(cellchat@idents))
+par(mfrow = c(1,2), xpd=TRUE)
+netVisual_circle(cellchat@net$count, vertex.weight = groupSize, weight.scale = T, label.edge= F, title.name = "Number of interactions")
+netVisual_circle(cellchat@net$weight, vertex.weight = groupSize, weight.scale = T, label.edge= F, title.name = "Interaction weights/strength")
+
+
+
+```
+
+
+```{r}
+
+mat <- cellchat@net$weight
+par(mfrow = c(1,1), xpd=TRUE)
+for (i in 1:nrow(mat)) {
+  mat2 <- matrix(0, nrow = nrow(mat), ncol = ncol(mat), dimnames = dimnames(mat))
+  mat2[i, ] <- mat[i, ]
+  netVisual_circle(mat2, vertex.weight = groupSize, weight.scale = T, edge.weight.max = max(mat), title.name = rownames(mat)[i])
+}
+
+
+
+```
+
+
+
+
+
+
+```{r}
+
+mat <- cellchatH@net$weight
+par(mfrow = c(3,4), xpd=TRUE)
+
+```
+
+```{r}
+
+for (i in 1:nrow(mat)) {
+  mat2 <- matrix(0, nrow = nrow(mat), ncol = ncol(mat), dimnames = dimnames(mat))
+  mat2[i, ] <- mat[i, ]
+  netVisual_circle(mat2, vertex.weight = groupSize, weight.scale = T, edge.weight.max = max(mat), title.name = rownames(mat)[i])
+}
+
+
+```
+
+## Outgoing and incoming signals
+
+```{r, fig.height = 8}
+
+
+ht1 <- netAnalysis_signalingRole_heatmap(cellchat, pattern = "outgoing", color.use = colclusterName, width = 12, height = 15, font.size = 6)
+ht2 <- netAnalysis_signalingRole_heatmap(cellchat, pattern = "incoming", color.use = colclusterName, width = 12, height = 15, font.size = 6)
+
+ht3 <- netAnalysis_signalingRole_heatmap(cellchat, pattern = "all", color.use = colclusterName, width = 12, height = 15, font.size = 6)
+ht1 
+ht2
+ht3
+
+
+
+```
+## Outgoing and incoming signals humans
+```{r, fig.height = 8}
+
+ht1 <- netAnalysis_signalingRole_heatmap(cellchatH, pattern = "outgoing", color.use = colclusterName, height = 20)
+ht2 <- netAnalysis_signalingRole_heatmap(cellchatH, pattern = "incoming", color.use = colclusterName, height = 20)
+ht3 <- netAnalysis_signalingRole_heatmap(cellchat, pattern = "all", color.use = colclusterName, width = 12, height = 15, font.size = 6)
+
+ 
+ht1 
+
+ht2
+
+ht3 
+
+```
+
+
+## PROS (ProteinS) - AXL
+```{r, echo = F}
+
+# Visualize the computed centrality scores using heatmap, allowing ready identification of major signaling roles of cell groups
+pathways.show <- c("PROS")
+netAnalysis_signalingRole_network(cellchatH, signaling = pathways.show, font.size = 10, color.heatmap = "Blues", color.use = colclusterName)
+
+pathways.show <- c("PROS")
+pairLR <- extractEnrichedLR(cellchatH, signaling = pathways.show, geneLR.return = FALSE)
+LR.show <- pairLR[1,] # first in list shown
+##  plot
+netVisual_individual(cellchatH, signaling = pathways.show, pairLR.use = LR.show,layout = "chord", color.use = colclusterName, weight.scale = T)
+
+```
+
+## PTN (Pleiotrophin)
+```{r, echo = F}
+
+# Visualize the computed centrality scores using heatmap, allowing ready identification of major signaling roles of cell groups
+pathways.show <- c("PTN")
+netAnalysis_signalingRole_network(cellchatH, signaling = pathways.show, font.size = 10, color.heatmap = "Blues", color.use = colclusterName)
+
+pathways.show <- c("PTN")
+pairLR <- extractEnrichedLR(cellchatH, signaling = pathways.show, geneLR.return = FALSE)
+LR.show <- pairLR[1,] # first in list shown
+##  plot
+netVisual_individual(cellchatH, signaling = pathways.show, pairLR.use = LR.show,layout = "chord", color.use = colclusterName, weight.scale = T)
+
+```
+
+
+## Periostin
+```{r, echo =F}
+
+# Visualize the computed centrality scores using heatmap, allowing ready identification of major signaling roles of cell groups
+pathways.show <- c("PERIOSTIN")
+netAnalysis_signalingRole_network(cellchatH, signaling = pathways.show, font.size = 10, color.heatmap = "Blues", color.use = colclusterName)
+
+pathways.show <- c("PERIOSTIN")
+pairLR <- extractEnrichedLR(cellchatH, signaling = pathways.show, geneLR.return = FALSE)
+LR.show <- pairLR[1,] # first in list shown
+##  plot
+netVisual_individual(cellchatH, signaling = pathways.show, pairLR.use = LR.show,layout = "chord", color.use = colclusterName, weight.scale = T)
+
+```
+
+## COLLAGEN
+```{r, echo = F}
+# Visualize the computed centrality scores using heatmap, allowing ready identification of major signaling roles of cell groups
+pathways.show <- c("COLLAGEN")
+netAnalysis_signalingRole_network(cellchatH, signaling = pathways.show, font.size = 10, color.heatmap = "Blues", color.use = colclusterName)
+
+pathways.show <- c("COLLAGEN")
+pairLR <- extractEnrichedLR(cellchatH, signaling = pathways.show, geneLR.return = FALSE)
+LR.show <- pairLR[1,] # first in list shown
+##  plot
+netVisual_individual(cellchatH, signaling = pathways.show, pairLR.use = LR.show,layout = "chord", color.use = colclusterName, weight.scale = T)
+
+```
+
+## IL1
+```{r, echo = F}
+
+# Visualize the computed centrality scores using heatmap, allowing ready identification of major signaling roles of cell groups
+pathways.show <- c("IL1")
+netAnalysis_signalingRole_network(cellchatH, signaling = pathways.show, font.size = 10, color.heatmap = "Blues", color.use = colclusterName)
+
+pathways.show <- c("IL1")
+pairLR <- extractEnrichedLR(cellchatH, signaling = pathways.show, geneLR.return = FALSE)
+LR.show <- pairLR[1,] # first in list shown
+## Circle plot
+netVisual_individual(cellchatH, signaling = pathways.show, pairLR.use = LR.show,layout = "chord", color.use = colclusterName, weight.scale = T)
+
+```
+
+## BMP
+```{r, echo = F}
+
+pathways.show <- c("BMP")
+netAnalysis_signalingRole_network(cellchatH, signaling = pathways.show, font.size = 10, color.heatmap = "Blues", color.use = colclusterName)
+
+pathways.show <- c("BMP")
+pairLR <- extractEnrichedLR(cellchatH, signaling = pathways.show, geneLR.return = FALSE)
+LR.show <- pairLR[1,] 
+
+netVisual_individual(cellchatH, signaling = pathways.show, pairLR.use = LR.show,layout = "chord", color.use = colclusterName, weight.scale = T)
+
+```
+
+## HGF
+```{r, echo = F}
+# Visualize the computed centrality scores using heatmap, allowing ready identification of major signaling roles of cell groups
+pathways.show <- c("HGF")
+netAnalysis_signalingRole_network(cellchatH, signaling = pathways.show, font.size = 10, color.heatmap = "Blues", color.use = colclusterName)
+
+pathways.show <- c("HGF")
+pairLR <- extractEnrichedLR(cellchatH, signaling = pathways.show, geneLR.return = FALSE)
+LR.show <- pairLR[1,] # first in list shown
+## Circle plot
+netVisual_individual(cellchatH, signaling = pathways.show, pairLR.use = LR.show,layout = "chord", color.use = colclusterName, weight.scale = T)
+```
+
+
+## CX3C
+```{r, echo = F}
+
+# Visualize the computed centrality scores using heatmap, allowing ready identification of major signaling roles of cell groups
+pathways.show <- c("CX3C")
+netAnalysis_signalingRole_network(cellchatH, signaling = pathways.show, font.size = 10, color.heatmap = "Blues", color.use = colclusterName)
+
+pathways.show <- c("CX3C")
+pairLR <- extractEnrichedLR(cellchatH, signaling = pathways.show, geneLR.return = FALSE)
+LR.show <- pairLR[1,] # first in list shown
+## Circle plot
+netVisual_individual(cellchatH, signaling = pathways.show, pairLR.use = LR.show,layout = "chord", color.use = colclusterName, weight.scale = T)
+
+```
+
+
+## CXCL
+```{r, echo = F}
+
+# Visualize the computed centrality scores using heatmap, allowing ready identification of major signaling roles of cell groups
+pathways.show <- c("CXCL")
+netAnalysis_signalingRole_network(cellchatH, signaling = pathways.show, font.size = 10, color.heatmap = "Blues", color.use = colclusterName)
+
+pathways.show <- c("CXCL")
+pairLR <- extractEnrichedLR(cellchatH, signaling = pathways.show, geneLR.return = FALSE)
+LR.show <- pairLR[1,] # first in list shown
+## Circle plot
+netVisual_individual(cellchatH, signaling = pathways.show, pairLR.use = LR.show,layout = "chord", color.use = colclusterName, weight.scale = T)
+
+```
+
+
+
+
+```{r}
+
+date()
+sessionInfo()
+
+```
+
+
+

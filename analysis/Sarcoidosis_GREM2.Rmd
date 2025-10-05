@@ -1,0 +1,725 @@
+---
+title: "Sarcoidosis GREM2 expression v2"
+author: "Emily Payne"
+date: "2025-06-05"
+output:
+  workflowr::wflow_html: default
+  html_document: default
+---
+
+
+```{r setup, include = FALSE, warning = FALSE, message = FALSE}
+
+options (width = 100)
+knitr::opts_chunk$set(warning = FALSE, echo = TRUE, message = FALSE, dev = c("png", "pdf"))
+seed <- 1234
+
+```
+
+
+```{r load libraries, echo = F}
+
+suppressPackageStartupMessages({
+  library(Seurat)
+  library(ggpubr)
+  library(pheatmap)
+  library(SingleCellExperiment)
+  library(dplyr)
+  library(tidyverse)
+  library(viridis)
+  library(muscat)
+  library(circlize)
+  library(destiny)
+  library(scater)
+  library(metap)
+  library(multtest)
+  library(clusterProfiler)
+  library(org.Hs.eg.db)
+  library(msigdbr)
+  library(enrichplot)
+  library(DOSE)
+  library(grid)
+  library(gridExtra)
+  library(ggupset)
+  library(VennDiagram)
+  library(NCmisc)
+  library(RColorBrewer)
+  library(EnhancedVolcano)
+  library(textshaping)
+  library(wordcloud)
+  library(pathview)
+  library(workflowr)
+  library(future)
+})
+
+```
+
+
+
+
+```{r}
+seuratM <- readRDS("~/Documents/Github/Cardiac Sarcoidosis/data/Merged/Sarcoidosis_vs_DonorHeart_v2.rds")
+"data/Merged/Sarcoidosis_vs_DonorHeart_v2.rds"
+```
+
+
+```{r, echo = FALSE, warning = FALSE}
+
+seuratM <- subset (seuratM, clusterName %in% c("CM", "Fb1","PeriFb", "VSMC", "BEC1","BEC2", "NC1", "TRM", "inflMph","Lymphocytes"))
+
+
+```
+## Cell counts
+```{r}
+table(seuratM$orig.ident)
+table(seuratM$clusterName)
+```
+
+
+# UMAP
+```{r, warning = FALSE}
+
+colclusterName <- c("#f4a582", "#FEE08B", "#3288BD", "#253494",  "#01665e", "#66C2A5", "#355C7D", "#a6bddb", "#fde0dd", "#dd1c77")
+
+names(colclusterName) <- c("CM", "Fb1","PeriFb", "VSMC", "BEC1","BEC2", "NC1", "TRM", "inflMph","Lymphocytes")
+
+seuratM$clusterName <- factor(seuratM$clusterName, levels=c("CM", "Fb1", "PeriFb", "VSMC", "BEC1","BEC2", "NC1", "TRM", "inflMph","Lymphocytes"))
+
+Idents(seuratM) <- seuratM$clusterName
+DimPlot(seuratM, reduction = "umap",label = TRUE, cols = colclusterName, repel = TRUE, pt.size = 0.01)
+                  
+
+```
+
+```{r}
+table(seuratM$clusterName)
+```
+
+
+
+## Heatmap GREM1, GREM2, BMP4 expression per cell cluster
+```{r, echo =F, warning = FALSE}
+
+Idents(seuratM) <- seuratM$clusterName
+
+
+genes <- data.frame(gene=rownames(seuratM)) %>% 
+  mutate(geneID=gsub("^.*\\.", "", gene))
+
+selGenes <- data.frame(geneID=rev(c("BMP4", "GREM1", "GREM2"))) %>% left_join(., genes, by="geneID") %>% filter(gene != "ENSG00000232995.RGS5") 
+
+
+avgHeatmap <- function(seuratM, selGenes, colVecIdent, colVecCond=NULL,
+                       ordVec=NULL, gapVecR=NULL, gapVecC=NULL,cc=FALSE,
+                       cr=FALSE, condCol=FALSE){
+  selGenes <- selGenes$gene
+  
+  clusterAssigned <- as.data.frame(Idents(seuratM)) %>%
+  dplyr::mutate(cell=rownames(.))
+  colnames(clusterAssigned)[1] <- "ident"
+  seuratDat <- GetAssayData(seuratM)
+  
+
+  genes <- data.frame(gene=rownames(seuratM)) %>% 
+    mutate(geneID=gsub("^.*\\.", "", gene)) %>% filter(geneID %in% selGenes)
+
+  logNormExpres <- as.data.frame(t(as.matrix(
+    seuratDat[which(rownames(seuratDat) %in% genes$gene),])))
+  logNormExpres <- logNormExpres %>% dplyr::mutate(cell=rownames(.)) %>%
+    dplyr::left_join(.,clusterAssigned, by=c("cell")) %>%
+    dplyr::select(-cell) %>% dplyr::group_by(ident) %>%
+    dplyr::summarise_all(mean)
+  logNormExpresMa <- logNormExpres %>% dplyr::select(-ident) %>% as.matrix()
+  rownames(logNormExpresMa) <- logNormExpres$ident
+  logNormExpresMa <- t(logNormExpresMa)
+  rownames(logNormExpresMa) <- gsub("^.*?\\.","",rownames(logNormExpresMa))
+  
+  ind <- apply(logNormExpresMa, 1, sd) == 0
+  logNormExpresMa <- logNormExpresMa[!ind,]
+  genes <- genes[!ind,]
+
+
+  annotation_col <- as.data.frame(gsub("(^.*?_)","",
+                                       colnames(logNormExpresMa)))%>%
+    dplyr::mutate(celltype=gsub("(_.*$)","",colnames(logNormExpresMa)))
+  colnames(annotation_col)[1] <- "col1"
+  annotation_col <- annotation_col %>%
+    dplyr::mutate(cond = gsub("(^[0-9]_?)","",col1)) %>%
+    dplyr::select(cond, celltype)
+  rownames(annotation_col) <- colnames(logNormExpresMa) 
+
+  ann_colors = list(
+      celltype=colVec)
+  if(is.null(ann_colors$cond)){
+    annotation_col$cond <- NULL
+  }
+  
+  logNormExpresMa <- logNormExpresMa[selGenes,]
+  if(is.null(ordVec)){
+  ordVec <- levels(seuratM)
+  ordVec <- c("CM", "Fb1", "PeriFb", "VSMC", "BEC1","BEC2", "NC1", "TRM", "inflMph","Lymphocytes")
+  }
+  logNormExpresMa <- logNormExpresMa[,ordVec]
+
+  pheatmap(logNormExpresMa, scale="row" ,treeheight_row = 0,cluster_rows = cr, 
+         cluster_cols = cc, color = colorRampPalette(c("#2166AC", "#F7F7F7", "#B2182B"))(50),
+         annotation_col = annotation_col, cellwidth=15, cellheight=10,
+         annotation_colors = ann_colors, gaps_row = gapVecR, gaps_col = gapVecC)
+}
+
+genesPlot <- data.frame(gene=c("BMP4", "GREM1", "GREM2"))
+
+
+levels(seuratM)
+
+
+colVec <- colclusterName
+
+# colVec <- c(colPal, colPal, colPal)
+# colVec <- c("blue", "red")
+
+#pdf("heatmap marker genes _v2.pdf", width = 8, height = 6)  
+avgHeatmap(seuratM, selGenes = genesPlot, colVecIdent = colVec)
+#dev.off()
+
+#genesPlot <- data.frame(gene=c("BMP4", "GREM1", "GREM2"))
+```
+
+## Feature Plots GREM1, GREM2, BMP4
+```{r, warning = FALSE, echo = F}
+
+
+get_full_gene_name <- function(gene, obj){
+  return(grep(gene,rownames(obj), value =TRUE))
+}
+get_full_gene_name("BMP4",seuratM) 
+
+FeaturePlot(seuratM, features = "ENSG00000125378.BMP4", pt.size = 3, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratM, features = get_full_gene_name("GREM1",seuratM) , pt.size = 3, cols = c("lightgrey", "#BE3144"))#
+FeaturePlot(seuratM, features = get_full_gene_name("GREM2",seuratM) , pt.size = 3, cols = c("lightgrey", "#BE3144"))
+
+
+```
+
+## Violin Plots: GREM2 expression per cell cluster
+```{r, warning = FALSE}
+VlnPlot(seuratM, features = "ENSG00000166923.GREM1", pt.size = 0.1, cols = colclusterName) + ggtitle ("GREM1")
+
+
+VlnPlot(seuratM, features = "ENSG00000180875.GREM2", pt.size = 0.1, cols = colclusterName) + ggtitle ("GREM2")
+
+VlnPlot(seuratM, features = "ENSG00000125378.BMP4", pt.size = 0.1, cols = colclusterName) + ggtitle ("BMP4")
+
+```
+
+## Violin Plots: GREM1, GREM2, BMP4 expression per condition (all clusters)
+```{r, warning = FALSE}
+
+
+VlnPlot(seuratM, features = "ENSG00000166923.GREM1", pt.size = 0.01, group.by ="pat_sub") +
+  scale_fill_manual(values = c("#355C7D", "#dfc27d")) + ggtitle ("GREM1")
+
+VlnPlot(seuratM, features = "ENSG00000180875.GREM2", pt.size = 0.01, group.by ="pat_sub") +
+  scale_fill_manual(values = c("#355C7D", "#dfc27d")) + ggtitle ("GREM2")
+
+VlnPlot(seuratM, features = "ENSG00000125378.BMP4", pt.size = 0.01, group.by ="pat_sub") +
+  scale_fill_manual(values = c("#355C7D", "#dfc27d")) + ggtitle ("BMP4")
+
+
+```
+
+## Violin Plots: GREM1, GREM2, BMP4 expression per patient (all clusters)
+```{r}
+VlnPlot(seuratM, features = "ENSG00000166923.GREM1", pt.size = 0.01, group.by ="patient") + ggtitle ("GREM1")
+
+VlnPlot(seuratM, features = "ENSG00000180875.GREM2", pt.size = 0.01, group.by ="patient") + ggtitle ("GREM2")
+
+VlnPlot(seuratM, features = "ENSG00000125378.BMP4", pt.size = 0.01, group.by ="patient") + ggtitle ("BMP4")
+
+```
+
+
+
+## Percentage of GREM2 expression only in Lymphocyte cluster for both conditions (Donor Heart and Sarco)
+```{r, warning = FALSE}
+Tcells <- colnames(seuratM)[seuratM@meta.data$clusterName == "Lymphocytes"]
+
+total_Tcells <- length(Tcells)
+
+GREM2_expression <- GetAssayData(seuratM, slot = "data")["ENSG00000180875.GREM2", Tcells]
+
+GREM2pos_Tcell <- sum(GREM2_expression > 0)
+
+Percentage_GREM2pos_T_cell <- GREM2pos_Tcell / total_Tcells * 100
+
+summary <- data.frame(
+  Total_T_cells = total_Tcells,
+  GREM2pos_Tcell = GREM2pos_Tcell,
+  Percentage_GREM2pos_T_cell = round(Percentage_GREM2pos_T_cell, 2))
+
+summary
+
+
+```
+
+
+
+## Number of Lymphocytes per Condition
+```{r, warning = FALSE}
+
+lymphocytes <- seuratM@meta.data[seuratM@meta.data$clusterName == "Lymphocytes", ]
+
+lymphocytes_per_condition <- table(lymphocytes$pat_sub)
+
+lymphocytes_per_condition
+
+```
+
+
+
+## Percentage of GREM expression per condition Sarcoidosis vs. Donor Heart
+```{r, warning = FALSE}
+
+Tcells <- colnames(seuratM)[seuratM@meta.data$clusterName == "Lymphocytes"]
+
+GREM2_expression <- GetAssayData(seuratM, slot = "data")["ENSG00000180875.GREM2", Tcells]
+
+
+conditions <- seuratM@meta.data[Tcells, "pat_sub"]
+
+df <- data.frame(
+  expression = as.numeric(GREM2_expression),
+  condition = factor(conditions))
+
+summary <- df %>%
+  group_by(condition) %>%
+  summarise(
+    n_cells = n(),
+     mean_expression = mean(expression),
+    n_expr = sum(expression > 0),
+    percent_expr = (n_expr / n_cells) * 100)
+
+print(summary)
+
+
+ggplot(df, aes(x = condition, y = expression, fill = condition)) +
+  geom_boxplot(outlier.shape = NA, alpha = 0.7) +
+  geom_jitter(width = 0.2, size = 0.5, alpha = 0.5) +
+  stat_compare_means(method = "wilcox.test") +
+  theme_classic() +
+  labs(title = "GREM2 expression in T cells by condition",y = "Expression (log-normalized counts)", x = "Condition")
+
+
+ggplot(summary, aes(x = condition, y = percent_expr, fill = condition)) +
+  geom_bar(stat = "identity", alpha = 0.7) +
+  geom_text(aes(label = paste0(round(percent_expr, 1), "%")), vjust = -0.5) +
+  ylim(0, 10) +
+  stat_compare_means(method = "wilcox.test") +
+  theme_classic() +
+  labs(title = "Percentage of T cells expressing GREM2 per condition",
+    x = "Condition",
+    y = "Percentage of T cells expressing GREM2")
+
+
+
+```
+
+## Correlations: Tcell abundance with GREM2, BMP4, GREM1
+```{r, warning = FALSE}
+
+datList <- NULL
+for(con in unique(seuratM$patient)){
+  seuratMSub <- subset(seuratM, patient==con)
+  print(dim(seuratMSub))
+  dat_con <- as.data.frame(table(seuratMSub$clusterName)) %>%
+  mutate(percent=Freq/ncol(seuratMSub)) %>% mutate(patient=con)
+  datList[[con]] <- dat_con
+}
+
+
+dat_all <- do.call("rbind", datList)
+
+dat_tc <- dat_all[dat_all$Var1 == "Lymphocytes", ]
+dat_tc$percent <- dat_tc$percent * 100
+
+
+genes <- c("ENSG00000180875.GREM2")
+
+
+expressionMatrix <- GetAssayData(seuratM, slot = "data")[genes, ]
+
+patient_metadata <- seuratM$patient
+
+mean_expression_per_patient <- data.frame(
+  patient = patient_metadata,
+  expr = expressionMatrix) %>%
+  group_by(patient) %>%
+  summarise(mean_expr = mean(expr))
+
+
+merged_df <- merge(dat_tc[, c("patient", "percent")],
+                   mean_expression_per_patient,
+                   by = "patient")
+
+head(merged_df)
+
+ggscatter(merged_df,
+          x = "percent",
+          y = "mean_expr",
+          add = "reg.line",
+          conf.int = TRUE,
+          cor.coef = TRUE,
+          cor.method = "pearson",
+          add.params = list(color = "gold", size = 1.2),
+          xlab = "T cell Relative abundance (%)",
+          ylab = "Log-normalized Mean GREM2 expression",
+          title = "Correlation: T cell abundance vs. GREM2 expression")
+
+
+```
+
+
+## Correlation: Tcell abundance with BMP4 
+```{r, warning = FALSE}
+
+dat_tc <- dat_all[dat_all$Var1 == "Lymphocytes", ]
+dat_tc$percent <- dat_tc$percent * 100
+
+
+genes <- c("ENSG00000125378.BMP4")
+
+
+expressionMatrix <- GetAssayData(seuratM, slot = "data")[genes, ]
+
+patient_metadata <- seuratM$patient
+
+mean_expression_per_patient <- data.frame(
+  patient = patient_metadata,
+  expr = expressionMatrix) %>%
+  group_by(patient) %>%
+  summarise(mean_expr = mean(expr))
+
+
+merged_df <- merge(dat_tc[, c("patient", "percent")],
+                   mean_expression_per_patient,
+                   by = "patient")
+
+head(merged_df)
+
+ggscatter(merged_df,
+          x = "percent",
+          y = "mean_expr",
+          add = "reg.line",
+          conf.int = TRUE,
+          cor.coef = TRUE,
+          cor.method = "pearson",
+          add.params = list(color = "blue", size = 1.2),
+          xlab = "T cell Relative abundance (%)",
+          ylab = "Log-normalized Mean BMP4 expression",
+          title = "Correlation: Lymphocyte abundance vs. BMP4 expression")
+
+
+```
+## Correlation Lymphocyte abundance and GREM1
+```{r, echo = FALSE, warning = FALSE}
+
+
+dat_tc <- dat_all[dat_all$Var1 == "Lymphocytes", ]
+dat_tc$percent <- dat_tc$percent * 100
+
+
+genes <- c("ENSG00000166923.GREM1")
+
+
+expressionMatrix <- GetAssayData(seuratM, slot = "data")[genes, ]
+
+patient_metadata <- seuratM$patient
+
+mean_expression_per_patient <- data.frame(
+  patient = patient_metadata,
+  expr = expressionMatrix) %>%
+  group_by(patient) %>%
+  summarise(mean_expr = mean(expr))
+
+
+merged_df <- merge(dat_tc[, c("patient", "percent")],
+                   mean_expression_per_patient,
+                   by = "patient")
+
+head(merged_df)
+
+ggscatter(merged_df,
+          x = "percent",
+          y = "mean_expr",
+          add = "reg.line",
+          conf.int = TRUE,
+          cor.coef = TRUE,
+          cor.method = "pearson",
+          add.params = list(color = "darkgreen", size = 1.2),
+          xlab = "T cell Relative abundance (%)",
+          ylab = "Log-normalized Mean GREM2 expression",
+          title = "Correlation: T cell abundance vs. GREM1 expression")
+
+
+
+```
+
+```{r, warning = FALSE}
+genes <- c("ENSG00000125378.BMP4", "ENSG00000180875.GREM2")
+
+expressionMatrix <- GetAssayData(seuratM, slot = "data")[genes, ]
+patient_metadata <- seuratM$patient
+
+
+mean_expression_per_patient <- data.frame(patient = patient_metadata,
+  t(expressionMatrix)) %>%
+  group_by(patient) %>%
+  summarise(
+    mean_BMP4 = mean(ENSG00000125378.BMP4),
+    mean_GREM2 = mean(ENSG00000180875.GREM2),
+    .groups = "drop")
+
+head(mean_expression_per_patient)
+
+ggscatter(mean_expression_per_patient,
+          x = "mean_BMP4",
+          y = "mean_GREM2",
+          add = "reg.line",
+          conf.int = TRUE,
+          cor.coef = TRUE,
+          cor.method = "pearson",
+          add.params = list(color = "darkred", size = 1.2),
+          xlab = "Log-normalized Mean BMP4 Expression",
+          ylab = "Log-normalized Mean GREM2 Expression",
+          title = "Correlation: BMP4 vs. GREM2 Expression per Patient")
+
+```
+
+## GSEA: which lymphocytes express GREM2
+```{r, warning = FALSE}
+
+seuratTcell <- subset(seuratM, clusterName %in% c("Lymphocytes"))
+table(seuratTcell$orig.ident)
+table(seuratTcell$patient)
+
+
+```
+
+
+### Subset Lymphocytes and GSEA
+
+```{r, warning = FALSE}
+seuratTcell <- NormalizeData (object = seuratTcell)
+seuratTcell <- FindVariableFeatures(object = seuratTcell)
+seuratTcell <- ScaleData(object = seuratTcell, verbose = TRUE)
+seuratTcell <- RunPCA(object=seuratTcell, npcs = 30, verbose = FALSE)
+
+ElbowPlot(seuratTcell, ndims = 30) +
+  ggplot2::geom_vline(xintercept = 10, linetype = "dashed", color = "red", linewidth = 1)
+
+seuratTcell <- RunTSNE(object=seuratTcell, reduction="pca", dims = 1:20)
+seuratTcell <- RunUMAP(object= seuratTcell, reduction="pca", dims = 1:20)
+seuratTcell <- FindNeighbors(object = seuratTcell, reduction = "pca", dims= 1:20)
+
+
+res <- c(0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 0.6, 0.8)
+for (i in 1:length(res)) {
+  seuratTcell <- FindClusters(object = seuratTcell, resolution = res[i], random.seed = 1234)
+}
+```
+
+```{r echo = FALSE, warning = FALSE}
+
+#Idents(seuratTcell) <- seuratTcell$RNA_snn_res.0.4
+
+#DimPlot(seuratTcell, reduction = "umap", label = TRUE)
+
+#Idents(seuratTcell) <- seuratTcell$RNA_snn_res.0.6
+
+#DimPlot(seuratTcell, reduction = "umap", label = TRUE)
+
+#Idents(seuratTcell) <- seuratTcell$RNA_snn_res.0.8
+
+#DimPlot(seuratTcell, reduction = "umap", label = TRUE)
+
+
+Idents(seuratTcell) <- seuratTcell$RNA_snn_res.0.25
+
+DimPlot(seuratTcell, reduction = "umap", label = TRUE)
+
+```
+## UMAP Lymphocyte Cluster GSEA
+```{r, warning = FALSE}
+
+## GSEA embedding of T cell subsets
+Idents(seuratTcell) <- seuratTcell$RNA_snn_res.0.25
+
+seuratTcell$clusterName <- "clusterName"
+Idents(seuratTcell) <- seuratTcell$clusterName
+seuratTcell$clusterName[which(seuratTcell$RNA_snn_res.0.25 %in% "0" )] <- "CD4+ Th cells"
+seuratTcell$clusterName[which(seuratTcell$RNA_snn_res.0.25 %in% "1" )] <- "B cells"
+seuratTcell$clusterName[which(seuratTcell$RNA_snn_res.0.25 %in% "2" )] <- "NK cells"
+seuratTcell$clusterName[which(seuratTcell$RNA_snn_res.0.25 %in% "3" )] <- "CD8+ T cells"
+seuratTcell$clusterName[which(seuratTcell$RNA_snn_res.0.25 %in% "4" )] <- "MAIT"
+
+           
+#colTcells_blue <- c("#1f78b4", "#a6cee3","#33a02c","#b2df8a","#ffed6f","#ffffb3","#084081","#0868ac","#2b8cbe","#4eb3d3")
+
+  
+colTcells<- c("#756bb1","maroon3", "maroon4","#2c7fb8", "#b3cde3")
+  
+
+seuratTcell$clusterName <- factor(seuratTcell$clusterName, levels = c("CD4+ Th cells", "CD8+ T cells", "NK cells", "MAIT", "B cells"))
+
+
+Idents(seuratTcell) <- seuratTcell$clusterName
+DimPlot(seuratTcell, reduction = "umap", cols = colTcells)
+
+
+```
+
+
+## Marker Genes T cell GSEA
+```{r, fig.height = 8, warning = FALSE}
+
+gene_list <- rev(c("CD2", "CD3E", "CD4", "CD8B", "CCR7", "FAS", "IL7R", "SELL", "CD44", "RORA", "CXCR3", "CCR6","RORC", "TBX21", "GATA3", "FOXP3", "CD69", "CTLA4", "CD27", "CD28","ICOS", "CD40LG", "IFNG", "CXCR3", "ITGB1", "CXCL10", "TGFB1", "SLC4A10", "NCAM1", "GZMB", "MKI67", "CLEC4C", "IL3RA", "CLEC9A", "IGHM","MS4A1", "JCHAIN"))
+
+
+Idents(seuratTcell) <- seuratTcell$clusterName
+
+genes <- data.frame(gene=rownames(seuratTcell)) %>% 
+  mutate(geneID=gsub("^.*\\.", "", gene))
+
+
+# Selected genes for DotPlot
+selGenes <- data.frame(geneID=rev(c("CD2", "CD3E", "CD4", "CD8A", "CD8B", "CCR7", "SELL", "CD44", "RORA", "CXCR3", "CCR6","RORC", "TBX21", "GREM2", "GATA3", "FOXP3", "CD69", "PDCD1", "CTLA4", "CD40LG", "IFNG", "ITGB1", "CXCL10", "SLC4A10", "TRDC1", "IGHM","MS4A1", "JCHAIN", "GZMB", "PRF1", "EOMES", "MKI67", "ZBTB16", "KLRD1","NCAM1", "FCGR3A"))) %>% left_join(., genes, by="geneID") %>% filter(gene != "ENSG00000232995.RGS5") 
+
+DotPlot(seuratTcell, features = selGenes$gene) + RotatedAxis() + scale_color_viridis(option="T") + coord_flip() 
+
+```
+
+
+
+```{r, warning = FALSE}
+
+VlnPlot(seuratTcell, features = "ENSG00000166923.GREM1", pt.size = 0.1, cols = colclusterName) + ggtitle ("GREM1")
+
+
+VlnPlot(seuratTcell, features = "ENSG00000180875.GREM2", pt.size = 0.1, cols = colclusterName) + ggtitle ("GREM2")
+
+VlnPlot(seuratTcell, features = "ENSG00000125378.BMP4", pt.size = 0.1, cols = colclusterName) + ggtitle ("BMP4")
+
+```
+
+## FeaturePlots GSEA Tcells: GREM2, GREM1, BMP4 
+```{r, warning = FALSE, echo = F}
+get_full_gene_name <- function(gene, obj){
+  return(grep(gene,rownames(obj), value =TRUE))
+}
+get_full_gene_name("BMP4",seuratTcell) 
+
+
+
+FeaturePlot(seuratTcell, features = "ENSG00000125378.BMP4", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratTcell, features = get_full_gene_name("GREM1",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))#
+FeaturePlot(seuratTcell, features = get_full_gene_name("GREM2",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))
+
+```
+
+
+## Feature Plots GSEA Lymphocyte Cluster: other marker genes
+```{r, echo = F}
+FeaturePlot(seuratTcell, features = "ENSG00000081237.PTPRC", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratTcell, features = "ENSG00000010610.CD4", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratTcell, features = "ENSG00000172116.CD8B", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratTcell, features = get_full_gene_name("CD8A", seuratTcell) , pt.size = 1, cols = c("lightgrey", "#BE3144"))# 
+FeaturePlot(seuratTcell, features = "ENSG00000116824.CD2", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+
+FeaturePlot(seuratTcell, features = "ENSG00000167286.CD3D", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratTcell, features = "ENSG00000198851.CD3E", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratTcell, features = get_full_gene_name("CXCR3",seuratTcell) , pt.size = 1, cols = c("lightgrey", "#BE3144"))# 
+
+
+FeaturePlot(seuratTcell, features = get_full_gene_name("STAT4",seuratTcell) , pt.size = 1, cols = c("lightgrey", "#BE3144"))# 
+FeaturePlot(seuratTcell, features = get_full_gene_name("IL12RB1",seuratTcell) , pt.size = 1, cols = c("lightgrey", "#BE3144"))#
+
+
+
+FeaturePlot(seuratTcell, features = get_full_gene_name("CCR6", seuratTcell) , pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratTcell, features = get_full_gene_name("RORC", seuratTcell) , pt.size = 1, cols = c("lightgrey", "#BE3144"))
+
+FeaturePlot(seuratTcell, features = "ENSG00000149294.NCAM1", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+
+FeaturePlot(seuratTcell, features = get_full_gene_name("GZMB",seuratTcell) , pt.size = 1, cols = c("lightgrey", "#BE3144"))
+
+FeaturePlot(seuratTcell, features = get_full_gene_name("PRF1",seuratTcell) , pt.size = 1, cols = c("lightgrey", "#BE3144"))
+
+FeaturePlot(seuratTcell, features = get_full_gene_name("KIR3DL1",seuratTcell) , pt.size = 1, cols = c("lightgrey", "#BE3144"))# NK
+FeaturePlot(seuratTcell, features = get_full_gene_name("TXK",seuratTcell) , pt.size = 1, cols = c("lightgrey", "#BE3144"))# 
+
+FeaturePlot(seuratTcell, features = get_full_gene_name("KLRD1",seuratTcell) , pt.size = 1, cols = c("lightgrey", "#BE3144")) # CD94
+FeaturePlot(seuratTcell, features = get_full_gene_name("FCGR3A",seuratTcell) , pt.size = 1, cols = c("lightgrey", "#BE3144")) #CD16
+FeaturePlot(seuratTcell, features = get_full_gene_name("GZMB",seuratTcell) , pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratTcell, features = "ENSG00000189430.NCR1", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratTcell, features = "ENSG00000162594.IL23R", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratTcell, features = "ENSG00000138795.LEF1", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+
+
+FeaturePlot(seuratTcell, features = "ENSG00000109906.ZBTB16", pt.size = 1, cols = c("lightgrey", "#BE3144"))	
+FeaturePlot(seuratTcell, features = "ENSG00000165810.BTNL9", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratTcell, features = "ENSG00000153029.MR1", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+
+
+FeaturePlot(seuratTcell, features = get_full_gene_name("TRAJ33",seuratTcell) , pt.size = 1, cols = c("lightgrey", "#BE3144"))#
+FeaturePlot(seuratTcell, features = get_full_gene_name("SLC4A10",seuratTcell) , pt.size = 1, cols = c("lightgrey", "#BE3144"))
+
+ #yd Tcells
+FeaturePlot(seuratTcell, features = get_full_gene_name("TRDV2",seuratTcell) , pt.size = 1, cols = c("lightgrey", "#BE3144")) # 
+FeaturePlot(seuratTcell, features = get_full_gene_name("TRGC1",seuratTcell) , pt.size = 1, cols = c("lightgrey", "#BE3144"))
+
+```
+
+
+```{r, warning = FALSE}
+
+get_features <- function(gene_symbols, seurat_obj) {
+  rn <- rownames(seurat_obj)
+  matched <- c()
+  for (g in gene_symbols) {
+    hit <- grep(paste0("\\.", g, "$"), rn, value = TRUE)  
+    if (length(hit) > 0) {
+      matched <- c(matched, hit[1])  
+    } else {
+      message("Gene not found: ", g)
+    }
+  }
+  return(matched)
+}
+
+th17_genes <- c("RORC", "IL23R", "CD3E", "CCR6")
+
+
+th17_features <- get_features(th17_genes, seuratTcell)
+print(th17_features)  
+
+# Th17 module score
+seuratTcell <- AddModuleScore(
+  object = seuratTcell,
+  features = list(th17_features),
+  name = "Th17_Score",
+  search = FALSE)
+
+FeaturePlot(seuratTcell,features = "Th17_Score1", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+
+
+```
+
+
+
+```{r}
+
+date()
+sessionInfo()
+
+```
+

@@ -1,0 +1,1727 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Emily Payne" />
+
+<meta name="date" content="2025-06-05" />
+
+<title>Sarcoidosis GREM2 expression</title>
+
+<script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Cardiac Sarcoidosis</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Sarcoidosis GREM2 expression</h1>
+<h4 class="author">Emily Payne</h4>
+<h4 class="date">2025-06-05</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2025-10-04
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 5
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 2
+</p>
+<p>
+<strong>Knit directory:</strong> <code>Cardiac Sarcoidosis/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.2). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted
+changes </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguncommittedchanges"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The R Markdown is untracked by Git. To know which version of the R
+Markdown file created these results, you’ll want to first commit it to
+the Git repo. If you’re still working on the analysis, you can ignore
+this warning. When you’re finished, you can run
+<code>wflow_publish</code> to commit the R Markdown file and build the
+HTML.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20251004code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20251004)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20251004code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20251004)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongabsolute">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>File paths:</strong> absolute </a>
+</p>
+</div>
+<div id="strongFilepathsstrongabsolute" class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Using absolute paths to the files within your workflowr project makes it
+difficult for you and others to run your code on a different machine.
+Change the absolute path(s) below to the suggested relative path(s) to
+make your code more reproducible.
+</p>
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th style="text-align:left;">
+absolute
+</th>
+<th style="text-align:left;">
+relative
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+~/Documents/Github/Cardiac
+Sarcoidosis/data/Merged/Sarcoidosis_vs_DonorHeart_v2.rds
+</td>
+<td style="text-align:left;">
+data/Merged/Sarcoidosis_vs_DonorHeart_v2.rds
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrong6ae5a3a">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong> 6ae5a3a
+</a>
+</p>
+</div>
+<div id="strongRepositoryversionstrong6ae5a3a"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version 6ae5a3a.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    R/
+    Ignored:    analysis/.DS_Store
+    Ignored:    data/Merged/
+
+Untracked files:
+    Untracked:  .gitignore.gitignore
+    Untracked:  analysis/Sarcoidosis Cluster annotations.Rmd
+    Untracked:  analysis/Sarcoidosis Clusters, marker genes and relative abundances.Rmd
+    Untracked:  analysis/Sarcoidosis GREM2 expression.Rmd
+    Untracked:  analysis/Sarcoidosis Subanalysis.Rmd
+    Untracked:  analysis/Sarcoidosis Validation for Nature Paper.Rmd
+    Untracked:  analysis/Sarcoidosis-GREM2-expression.Rmd
+    Untracked:  code/gitignore
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+There are no past versions. Publish this analysis with
+<code>wflow_publish()</code> to start tracking its development.
+</p>
+<hr>
+</div>
+</div>
+</div>
+<pre class="r"><code>suppressPackageStartupMessages({
+  library(Seurat)
+  library(ggpubr)
+  library(pheatmap)
+  library(SingleCellExperiment)
+  library(dplyr)
+  library(tidyverse)
+  library(viridis)
+  library(muscat)
+  library(circlize)
+  library(destiny)
+  library(scater)
+  library(metap)
+  library(multtest)
+  library(clusterProfiler)
+  library(org.Hs.eg.db)
+  library(msigdbr)
+  library(enrichplot)
+  library(DOSE)
+  library(grid)
+  library(gridExtra)
+  library(ggupset)
+  library(VennDiagram)
+  library(NCmisc)
+  library(RColorBrewer)
+  library(EnhancedVolcano)
+  library(textshaping)
+  library(wordcloud)
+  library(pathview)
+  library(workflowr)
+  library(future)
+})</code></pre>
+<pre class="r"><code>seuratM &lt;- readRDS(&quot;~/Documents/Github/Cardiac Sarcoidosis/data/Merged/Sarcoidosis_vs_DonorHeart_v2.rds&quot;)
+&quot;data/Merged/Sarcoidosis_vs_DonorHeart_v2.rds&quot;</code></pre>
+<pre><code>[1] &quot;data/Merged/Sarcoidosis_vs_DonorHeart_v2.rds&quot;</code></pre>
+<pre><code>
+      
+49601 </code></pre>
+<pre><code>
+       BEC1        BEC2          CM         Fb1     inflMph Lymphocytes         NC1      PeriFb 
+       9974        1246        6754       12879          75         853         779       10478 
+        TRM        VSMC 
+       5180        1383 </code></pre>
+<div id="cell-counts" class="section level2">
+<h2>Cell counts</h2>
+<pre class="r"><code>table(seuratM$orig.ident)</code></pre>
+<pre><code>
+      
+49601 </code></pre>
+<pre class="r"><code>table(seuratM$clusterName)</code></pre>
+<pre><code>
+       BEC1        BEC2          CM         Fb1     inflMph Lymphocytes         NC1      PeriFb 
+       9974        1246        6754       12879          75         853         779       10478 
+        TRM        VSMC 
+       5180        1383 </code></pre>
+</div>
+<div id="umap" class="section level1">
+<h1>UMAP</h1>
+<pre class="r"><code>colclusterName &lt;- c(&quot;#f4a582&quot;, &quot;#FEE08B&quot;, &quot;#3288BD&quot;, &quot;#253494&quot;,  &quot;#01665e&quot;, &quot;#66C2A5&quot;, &quot;#355C7D&quot;, &quot;#a6bddb&quot;, &quot;#fde0dd&quot;, &quot;#dd1c77&quot;)
+
+names(colclusterName) &lt;- c(&quot;CM&quot;, &quot;Fb1&quot;,&quot;PeriFb&quot;, &quot;VSMC&quot;, &quot;BEC1&quot;,&quot;BEC2&quot;, &quot;NC1&quot;, &quot;TRM&quot;, &quot;inflMph&quot;,&quot;Lymphocytes&quot;)
+
+seuratM$clusterName &lt;- factor(seuratM$clusterName, levels=c(&quot;CM&quot;, &quot;Fb1&quot;, &quot;PeriFb&quot;, &quot;VSMC&quot;, &quot;BEC1&quot;,&quot;BEC2&quot;, &quot;NC1&quot;, &quot;TRM&quot;, &quot;inflMph&quot;,&quot;Lymphocytes&quot;))
+
+Idents(seuratM) &lt;- seuratM$clusterName
+DimPlot(seuratM, reduction = &quot;umap&quot;,label = TRUE, cols = colclusterName, repel = TRUE, pt.size = 0.01)</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code>table(seuratM$clusterName)</code></pre>
+<pre><code>
+         CM         Fb1      PeriFb        VSMC        BEC1        BEC2         NC1         TRM 
+       6754       12879       10478        1383        9974        1246         779        5180 
+    inflMph Lymphocytes 
+         75         853 </code></pre>
+<div id="heatmap-grem1-grem2-bmp4-expression-per-cell-cluster"
+class="section level2">
+<h2>Heatmap GREM1, GREM2, BMP4 expression per cell cluster</h2>
+<pre><code> [1] &quot;CM&quot;          &quot;Fb1&quot;         &quot;PeriFb&quot;      &quot;VSMC&quot;        &quot;BEC1&quot;        &quot;BEC2&quot;       
+ [7] &quot;NC1&quot;         &quot;TRM&quot;         &quot;inflMph&quot;     &quot;Lymphocytes&quot;</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+</div>
+<div id="feature-plots-grem1-grem2-bmp4" class="section level2">
+<h2>Feature Plots GREM1, GREM2, BMP4</h2>
+<pre class="r"><code>get_full_gene_name &lt;- function(gene, obj){
+  return(grep(gene,rownames(obj), value =TRUE))
+}
+get_full_gene_name(&quot;BMP4&quot;,seuratM) </code></pre>
+<pre><code>[1] &quot;ENSG00000125378.BMP4&quot;</code></pre>
+<pre class="r"><code>FeaturePlot(seuratM, features = &quot;ENSG00000125378.BMP4&quot;, pt.size = 3, cols = c(&quot;lightgrey&quot;, &quot;#BE3144&quot;))</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code>FeaturePlot(seuratM, features = get_full_gene_name(&quot;GREM1&quot;,seuratM) , pt.size = 3, cols = c(&quot;lightgrey&quot;, &quot;#BE3144&quot;))#</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-7-2.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code>FeaturePlot(seuratM, features = get_full_gene_name(&quot;GREM2&quot;,seuratM) , pt.size = 3, cols = c(&quot;lightgrey&quot;, &quot;#BE3144&quot;))</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-7-3.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+</div>
+<div id="violin-plots-grem2-expression-per-cell-cluster"
+class="section level2">
+<h2>Violin Plots: GREM2 expression per cell cluster</h2>
+<pre class="r"><code>VlnPlot(seuratM, features = &quot;ENSG00000166923.GREM1&quot;, pt.size = 0.1, cols = colclusterName) + ggtitle (&quot;GREM1&quot;)</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code>VlnPlot(seuratM, features = &quot;ENSG00000180875.GREM2&quot;, pt.size = 0.1, cols = colclusterName) + ggtitle (&quot;GREM2&quot;)</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-8-2.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code>VlnPlot(seuratM, features = &quot;ENSG00000125378.BMP4&quot;, pt.size = 0.1, cols = colclusterName) + ggtitle (&quot;BMP4&quot;)</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-8-3.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+</div>
+<div id="violin-plots-grem1-grem2-bmp4-expression-per-condition"
+class="section level2">
+<h2>Violin Plots: GREM1, GREM2, BMP4 expression per condition</h2>
+<pre class="r"><code>VlnPlot(seuratM, features = &quot;ENSG00000166923.GREM1&quot;, pt.size = 0.01, group.by =&quot;pat_sub&quot;) +
+  scale_fill_manual(values = c(&quot;#355C7D&quot;, &quot;#dfc27d&quot;)) + ggtitle (&quot;GREM1&quot;)</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code>VlnPlot(seuratM, features = &quot;ENSG00000180875.GREM2&quot;, pt.size = 0.01, group.by =&quot;pat_sub&quot;) +
+  scale_fill_manual(values = c(&quot;#355C7D&quot;, &quot;#dfc27d&quot;)) + ggtitle (&quot;GREM2&quot;)</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-9-2.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code>VlnPlot(seuratM, features = &quot;ENSG00000125378.BMP4&quot;, pt.size = 0.01, group.by =&quot;pat_sub&quot;) +
+  scale_fill_manual(values = c(&quot;#355C7D&quot;, &quot;#dfc27d&quot;)) + ggtitle (&quot;BMP4&quot;)</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-9-3.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+</div>
+<div
+id="percentage-of-grem2-expression-in-lymphocyte-cluster-for-all-conditions"
+class="section level2">
+<h2>Percentage of GREM2 expression in Lymphocyte cluster for all
+conditions</h2>
+<pre class="r"><code>Tcells &lt;- colnames(seuratM)[seuratM@meta.data$clusterName == &quot;Lymphocytes&quot;]
+
+total_Tcells &lt;- length(Tcells)
+
+GREM2_expression &lt;- GetAssayData(seuratM, slot = &quot;data&quot;)[&quot;ENSG00000180875.GREM2&quot;, Tcells]
+
+GREM2pos_Tcell &lt;- sum(GREM2_expression &gt; 0)
+
+Percentage_GREM2pos_T_cell &lt;- GREM2pos_Tcell / total_Tcells * 100
+
+summary &lt;- data.frame(
+  Total_T_cells = total_Tcells,
+  GREM2pos_Tcell = GREM2pos_Tcell,
+  Percentage_GREM2pos_T_cell = round(Percentage_GREM2pos_T_cell, 2))
+
+summary</code></pre>
+<pre><code>  Total_T_cells GREM2pos_Tcell Percentage_GREM2pos_T_cell
+1           853             24                       2.81</code></pre>
+</div>
+<div id="number-of-lymphocytes-per-condition" class="section level2">
+<h2>Number of Lymphocytes per Condition</h2>
+<pre class="r"><code>lymphocytes &lt;- seuratM@meta.data[seuratM@meta.data$clusterName == &quot;Lymphocytes&quot;, ]
+
+lymphocytes_per_condition &lt;- table(lymphocytes$pat_sub)
+
+lymphocytes_per_condition</code></pre>
+<pre><code>
+ DonorHeart Sarcoidosis 
+        614         239 </code></pre>
+</div>
+<div
+id="percentage-of-grem-expression-per-condition-sarcoidosis-vs.-donor-heart"
+class="section level2">
+<h2>Percentage of GREM expression per condition Sarcoidosis vs. Donor
+Heart</h2>
+<pre class="r"><code>Tcells &lt;- colnames(seuratM)[seuratM@meta.data$clusterName == &quot;Lymphocytes&quot;]
+
+GREM2_expression &lt;- GetAssayData(seuratM, slot = &quot;data&quot;)[&quot;ENSG00000180875.GREM2&quot;, Tcells]
+
+
+conditions &lt;- seuratM@meta.data[Tcells, &quot;pat_sub&quot;]
+
+df &lt;- data.frame(
+  expression = as.numeric(GREM2_expression),
+  condition = factor(conditions))
+
+summary &lt;- df %&gt;%
+  group_by(condition) %&gt;%
+  summarise(
+    n_cells = n(),
+     mean_expression = mean(expression),
+    n_expr = sum(expression &gt; 0),
+    percent_expr = (n_expr / n_cells) * 100)
+
+print(summary)</code></pre>
+<pre><code># A tibble: 2 × 5
+  condition   n_cells mean_expression n_expr percent_expr
+  &lt;fct&gt;         &lt;int&gt;           &lt;dbl&gt;  &lt;int&gt;        &lt;dbl&gt;
+1 DonorHeart      614          0.0729     22        3.58 
+2 Sarcoidosis     239          0.0218      2        0.837</code></pre>
+<pre class="r"><code>ggplot(df, aes(x = condition, y = expression, fill = condition)) +
+  geom_boxplot(outlier.shape = NA, alpha = 0.7) +
+  geom_jitter(width = 0.2, size = 0.5, alpha = 0.5) +
+  stat_compare_means(method = &quot;wilcox.test&quot;) +
+  theme_classic() +
+  labs(title = &quot;GREM2 expression in T cells by condition&quot;,y = &quot;Expression (log-normalized counts)&quot;, x = &quot;Condition&quot;)</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code>ggplot(summary, aes(x = condition, y = percent_expr, fill = condition)) +
+  geom_bar(stat = &quot;identity&quot;, alpha = 0.7) +
+  geom_text(aes(label = paste0(round(percent_expr, 1), &quot;%&quot;)), vjust = -0.5) +
+  ylim(0, 10) +
+  stat_compare_means(method = &quot;wilcox.test&quot;) +
+  theme_classic() +
+  labs(title = &quot;Percentage of T cells expressing GREM2 per condition&quot;,
+    x = &quot;Condition&quot;,
+    y = &quot;Percentage of T cells expressing GREM2&quot;)</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-12-2.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+</div>
+<div id="correlations-tcell-abundance-with-grem2-bmp4-grem1"
+class="section level2">
+<h2>Correlations: Tcell abundance with GREM2, BMP4, GREM1</h2>
+<pre class="r"><code>datList &lt;- NULL
+for(con in unique(seuratM$patient)){
+  seuratMSub &lt;- subset(seuratM, patient==con)
+  print(dim(seuratMSub))
+  dat_con &lt;- as.data.frame(table(seuratMSub$clusterName)) %&gt;%
+  mutate(percent=Freq/ncol(seuratMSub)) %&gt;% mutate(patient=con)
+  datList[[con]] &lt;- dat_con
+}</code></pre>
+<pre><code>[1] 44729  3853
+[1] 44729  1502
+[1] 44729  3711
+[1] 44729  4083
+[1] 44729  3712
+[1] 44729  6154
+[1] 44729 10880
+[1] 44729  1413
+[1] 44729  1998
+[1] 44729   818
+[1] 44729  2098
+[1] 44729  2820
+[1] 44729  1338
+[1] 44729   149
+[1] 44729  2399
+[1] 44729  2673</code></pre>
+<pre class="r"><code>dat_all &lt;- do.call(&quot;rbind&quot;, datList)
+
+dat_tc &lt;- dat_all[dat_all$Var1 == &quot;Lymphocytes&quot;, ]
+dat_tc$percent &lt;- dat_tc$percent * 100
+
+
+genes &lt;- c(&quot;ENSG00000180875.GREM2&quot;)
+
+
+expressionMatrix &lt;- GetAssayData(seuratM, slot = &quot;data&quot;)[genes, ]
+
+patient_metadata &lt;- seuratM$patient
+
+mean_expression_per_patient &lt;- data.frame(
+  patient = patient_metadata,
+  expr = expressionMatrix) %&gt;%
+  group_by(patient) %&gt;%
+  summarise(mean_expr = mean(expr))
+
+
+merged_df &lt;- merge(dat_tc[, c(&quot;patient&quot;, &quot;percent&quot;)],
+                   mean_expression_per_patient,
+                   by = &quot;patient&quot;)
+
+head(merged_df)</code></pre>
+<pre><code>         patient   percent   mean_expr
+1 Donor Heart 01 0.7812500 0.008390971
+2 Donor Heart 02 1.6091357 0.005414281
+3 Donor Heart 03 1.8112488 0.004244485
+4 Donor Heart 04 0.9779951 0.000000000
+5 Donor Heart 05 1.3513514 0.010305427
+6 Donor Heart 06 0.6369427 0.003910078</code></pre>
+<pre class="r"><code>ggscatter(merged_df,
+          x = &quot;percent&quot;,
+          y = &quot;mean_expr&quot;,
+          add = &quot;reg.line&quot;,
+          conf.int = TRUE,
+          cor.coef = TRUE,
+          cor.method = &quot;pearson&quot;,
+          add.params = list(color = &quot;gold&quot;, size = 1.2),
+          xlab = &quot;T cell Relative abundance (%)&quot;,
+          ylab = &quot;Log-normalized Mean GREM2 expression&quot;,
+          title = &quot;Correlation: T cell abundance vs. GREM2 expression&quot;)</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+</div>
+<div id="correlation-tcell-abundance-with-bmp4" class="section level2">
+<h2>Correlation: Tcell abundance with BMP4</h2>
+<pre class="r"><code>dat_tc &lt;- dat_all[dat_all$Var1 == &quot;Lymphocytes&quot;, ]
+dat_tc$percent &lt;- dat_tc$percent * 100
+
+
+genes &lt;- c(&quot;ENSG00000125378.BMP4&quot;)
+
+
+expressionMatrix &lt;- GetAssayData(seuratM, slot = &quot;data&quot;)[genes, ]
+
+patient_metadata &lt;- seuratM$patient
+
+mean_expression_per_patient &lt;- data.frame(
+  patient = patient_metadata,
+  expr = expressionMatrix) %&gt;%
+  group_by(patient) %&gt;%
+  summarise(mean_expr = mean(expr))
+
+
+merged_df &lt;- merge(dat_tc[, c(&quot;patient&quot;, &quot;percent&quot;)],
+                   mean_expression_per_patient,
+                   by = &quot;patient&quot;)
+
+head(merged_df)</code></pre>
+<pre><code>         patient   percent  mean_expr
+1 Donor Heart 01 0.7812500 0.08774414
+2 Donor Heart 02 1.6091357 0.05470208
+3 Donor Heart 03 1.8112488 0.03958082
+4 Donor Heart 04 0.9779951 0.04394856
+5 Donor Heart 05 1.3513514 0.03318363
+6 Donor Heart 06 0.6369427 0.02781834</code></pre>
+<pre class="r"><code>ggscatter(merged_df,
+          x = &quot;percent&quot;,
+          y = &quot;mean_expr&quot;,
+          add = &quot;reg.line&quot;,
+          conf.int = TRUE,
+          cor.coef = TRUE,
+          cor.method = &quot;pearson&quot;,
+          add.params = list(color = &quot;blue&quot;, size = 1.2),
+          xlab = &quot;T cell Relative abundance (%)&quot;,
+          ylab = &quot;Log-normalized Mean BMP4 expression&quot;,
+          title = &quot;Correlation: Lymphocyte abundance vs. BMP4 expression&quot;)</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+</div>
+<div id="correlation-lymphocyte-abundance-and-grem1"
+class="section level2">
+<h2>Correlation Lymphocyte abundance and GREM1</h2>
+<pre><code>         patient   percent   mean_expr
+1 Donor Heart 01 0.7812500 0.001703631
+2 Donor Heart 02 1.6091357 0.002415377
+3 Donor Heart 03 1.8112488 0.008369347
+4 Donor Heart 04 0.9779951 0.006451727
+5 Donor Heart 05 1.3513514 0.007013899
+6 Donor Heart 06 0.6369427 0.005882823</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-15-1.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code>genes &lt;- c(&quot;ENSG00000125378.BMP4&quot;, &quot;ENSG00000180875.GREM2&quot;)
+
+expressionMatrix &lt;- GetAssayData(seuratM, slot = &quot;data&quot;)[genes, ]
+patient_metadata &lt;- seuratM$patient
+
+
+mean_expression_per_patient &lt;- data.frame(patient = patient_metadata,
+  t(expressionMatrix)) %&gt;%
+  group_by(patient) %&gt;%
+  summarise(
+    mean_BMP4 = mean(ENSG00000125378.BMP4),
+    mean_GREM2 = mean(ENSG00000180875.GREM2),
+    .groups = &quot;drop&quot;)
+
+head(mean_expression_per_patient)</code></pre>
+<pre><code># A tibble: 6 × 3
+  patient        mean_BMP4 mean_GREM2
+  &lt;chr&gt;              &lt;dbl&gt;      &lt;dbl&gt;
+1 Donor Heart 01    0.0877    0.00839
+2 Donor Heart 02    0.0547    0.00541
+3 Donor Heart 03    0.0396    0.00424
+4 Donor Heart 04    0.0439    0      
+5 Donor Heart 05    0.0332    0.0103 
+6 Donor Heart 06    0.0278    0.00391</code></pre>
+<pre class="r"><code>ggscatter(mean_expression_per_patient,
+          x = &quot;mean_BMP4&quot;,
+          y = &quot;mean_GREM2&quot;,
+          add = &quot;reg.line&quot;,
+          conf.int = TRUE,
+          cor.coef = TRUE,
+          cor.method = &quot;pearson&quot;,
+          add.params = list(color = &quot;darkred&quot;, size = 1.2),
+          xlab = &quot;Log-normalized Mean BMP4 Expression&quot;,
+          ylab = &quot;Log-normalized Mean GREM2 Expression&quot;,
+          title = &quot;Correlation: BMP4 vs. GREM2 Expression per Patient&quot;)</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+</div>
+<div id="gsea-which-lymphocytes-express-grem2" class="section level2">
+<h2>GSEA: which lymphocytes express GREM2</h2>
+<pre class="r"><code>seuratTcell &lt;- subset(seuratM, clusterName %in% c(&quot;Lymphocytes&quot;))
+table(seuratTcell$orig.ident)</code></pre>
+<pre><code>
+    
+853 </code></pre>
+<pre class="r"><code>table(seuratTcell$patient)</code></pre>
+<pre><code>
+Donor Heart 01 Donor Heart 02 Donor Heart 03 Donor Heart 04 Donor Heart 05 Donor Heart 06 
+            29             62             38              8             27              9 
+Donor Heart 07 Donor Heart 08 Donor Heart 09 Donor Heart 10 Donor Heart 11 Sarcoidosis 01 
+            86            112             39            102            102             57 
+Sarcoidosis 02 Sarcoidosis 03 Sarcoidosis 04 Sarcoidosis 05 
+           120             29              5             28 </code></pre>
+<div id="subset-lymphocytes-and-gsea" class="section level3">
+<h3>Subset Lymphocytes and GSEA</h3>
+<pre class="r"><code>seuratTcell &lt;- NormalizeData (object = seuratTcell)
+seuratTcell &lt;- FindVariableFeatures(object = seuratTcell)
+seuratTcell &lt;- ScaleData(object = seuratTcell, verbose = TRUE)
+seuratTcell &lt;- RunPCA(object=seuratTcell, npcs = 30, verbose = FALSE)
+
+ElbowPlot(seuratTcell, ndims = 30) +
+  ggplot2::geom_vline(xintercept = 10, linetype = &quot;dashed&quot;, color = &quot;red&quot;, linewidth = 1)</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-18-1.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code>seuratTcell &lt;- RunTSNE(object=seuratTcell, reduction=&quot;pca&quot;, dims = 1:20)
+seuratTcell &lt;- RunUMAP(object= seuratTcell, reduction=&quot;pca&quot;, dims = 1:20)
+seuratTcell &lt;- FindNeighbors(object = seuratTcell, reduction = &quot;pca&quot;, dims= 1:20)
+
+
+res &lt;- c(0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 0.6, 0.8)
+for (i in 1:length(res)) {
+  seuratTcell &lt;- FindClusters(object = seuratTcell, resolution = res[i], random.seed = 1234)
+}</code></pre>
+<pre><code>Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck
+
+Number of nodes: 853
+Number of edges: 32217
+
+Running Louvain algorithm...
+Maximum modularity in 10 random starts: 0.9198
+Number of communities: 3
+Elapsed time: 0 seconds
+Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck
+
+Number of nodes: 853
+Number of edges: 32217
+
+Running Louvain algorithm...
+Maximum modularity in 10 random starts: 0.8908
+Number of communities: 3
+Elapsed time: 0 seconds
+Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck
+
+Number of nodes: 853
+Number of edges: 32217
+
+Running Louvain algorithm...
+Maximum modularity in 10 random starts: 0.8660
+Number of communities: 3
+Elapsed time: 0 seconds
+Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck
+
+Number of nodes: 853
+Number of edges: 32217
+
+Running Louvain algorithm...
+Maximum modularity in 10 random starts: 0.8426
+Number of communities: 5
+Elapsed time: 0 seconds
+Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck
+
+Number of nodes: 853
+Number of edges: 32217
+
+Running Louvain algorithm...
+Maximum modularity in 10 random starts: 0.8266
+Number of communities: 6
+Elapsed time: 0 seconds
+Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck
+
+Number of nodes: 853
+Number of edges: 32217
+
+Running Louvain algorithm...
+Maximum modularity in 10 random starts: 0.8018
+Number of communities: 7
+Elapsed time: 0 seconds
+Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck
+
+Number of nodes: 853
+Number of edges: 32217
+
+Running Louvain algorithm...
+Maximum modularity in 10 random starts: 0.7624
+Number of communities: 7
+Elapsed time: 0 seconds
+Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck
+
+Number of nodes: 853
+Number of edges: 32217
+
+Running Louvain algorithm...
+Maximum modularity in 10 random starts: 0.7233
+Number of communities: 8
+Elapsed time: 0 seconds</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-19-1.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+</div>
+</div>
+<div id="umap-lymphocyte-cluster-gsea" class="section level2">
+<h2>UMAP Lymphocyte Cluster GSEA</h2>
+<pre class="r"><code>## GSEA embedding of T cell subsets
+Idents(seuratTcell) &lt;- seuratTcell$RNA_snn_res.0.25
+
+seuratTcell$clusterName &lt;- &quot;clusterName&quot;
+Idents(seuratTcell) &lt;- seuratTcell$clusterName
+seuratTcell$clusterName[which(seuratTcell$RNA_snn_res.0.25 %in% &quot;0&quot; )] &lt;- &quot;CD4+ Th cells&quot;
+seuratTcell$clusterName[which(seuratTcell$RNA_snn_res.0.25 %in% &quot;1&quot; )] &lt;- &quot;B cells&quot;
+seuratTcell$clusterName[which(seuratTcell$RNA_snn_res.0.25 %in% &quot;2&quot; )] &lt;- &quot;NK cells&quot;
+seuratTcell$clusterName[which(seuratTcell$RNA_snn_res.0.25 %in% &quot;3&quot; )] &lt;- &quot;CD8+ T cells&quot;
+seuratTcell$clusterName[which(seuratTcell$RNA_snn_res.0.25 %in% &quot;4&quot; )] &lt;- &quot;MAIT&quot;
+
+           
+#colTcells_blue &lt;- c(&quot;#1f78b4&quot;, &quot;#a6cee3&quot;,&quot;#33a02c&quot;,&quot;#b2df8a&quot;,&quot;#ffed6f&quot;,&quot;#ffffb3&quot;,&quot;#084081&quot;,&quot;#0868ac&quot;,&quot;#2b8cbe&quot;,&quot;#4eb3d3&quot;)
+
+  
+colTcells&lt;- c(&quot;#756bb1&quot;,&quot;maroon3&quot;, &quot;maroon4&quot;,&quot;#2c7fb8&quot;, &quot;#b3cde3&quot;)
+  
+
+seuratTcell$clusterName &lt;- factor(seuratTcell$clusterName, levels = c(&quot;CD4+ Th cells&quot;, &quot;CD8+ T cells&quot;, &quot;NK cells&quot;, &quot;MAIT&quot;, &quot;B cells&quot;))
+
+
+Idents(seuratTcell) &lt;- seuratTcell$clusterName
+DimPlot(seuratTcell, reduction = &quot;umap&quot;, cols = colTcells)</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-20-1.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+</div>
+<div id="marker-genes-t-cell-gsea" class="section level2">
+<h2>Marker Genes T cell GSEA</h2>
+<pre class="r"><code>gene_list &lt;- rev(c(&quot;CD2&quot;, &quot;CD3E&quot;, &quot;CD4&quot;, &quot;CD8B&quot;, &quot;CCR7&quot;, &quot;FAS&quot;, &quot;IL7R&quot;, &quot;SELL&quot;, &quot;CD44&quot;, &quot;RORA&quot;, &quot;CXCR3&quot;, &quot;CCR6&quot;,&quot;RORC&quot;, &quot;TBX21&quot;, &quot;GATA3&quot;, &quot;FOXP3&quot;, &quot;CD69&quot;, &quot;CTLA4&quot;, &quot;CD27&quot;, &quot;CD28&quot;,&quot;ICOS&quot;, &quot;CD40LG&quot;, &quot;IFNG&quot;, &quot;CXCR3&quot;, &quot;ITGB1&quot;, &quot;CXCL10&quot;, &quot;TGFB1&quot;, &quot;SLC4A10&quot;, &quot;NCAM1&quot;, &quot;GZMB&quot;, &quot;MKI67&quot;, &quot;CLEC4C&quot;, &quot;IL3RA&quot;, &quot;CLEC9A&quot;, &quot;IGHM&quot;,&quot;MS4A1&quot;, &quot;JCHAIN&quot;))
+
+
+Idents(seuratTcell) &lt;- seuratTcell$clusterName
+
+genes &lt;- data.frame(gene=rownames(seuratTcell)) %&gt;% 
+  mutate(geneID=gsub(&quot;^.*\\.&quot;, &quot;&quot;, gene))
+
+
+# Selected genes for DotPlot
+selGenes &lt;- data.frame(geneID=rev(c(&quot;CD2&quot;, &quot;CD3E&quot;, &quot;CD4&quot;, &quot;CD8A&quot;, &quot;CD8B&quot;, &quot;CCR7&quot;, &quot;SELL&quot;, &quot;CD44&quot;, &quot;RORA&quot;, &quot;CXCR3&quot;, &quot;CCR6&quot;,&quot;RORC&quot;, &quot;TBX21&quot;, &quot;GREM2&quot;, &quot;GATA3&quot;, &quot;FOXP3&quot;, &quot;CD69&quot;, &quot;PDCD1&quot;, &quot;CTLA4&quot;, &quot;CD40LG&quot;, &quot;IFNG&quot;, &quot;ITGB1&quot;, &quot;CXCL10&quot;, &quot;SLC4A10&quot;, &quot;TRDC1&quot;, &quot;IGHM&quot;,&quot;MS4A1&quot;, &quot;JCHAIN&quot;, &quot;GZMB&quot;, &quot;PRF1&quot;, &quot;EOMES&quot;, &quot;MKI67&quot;, &quot;ZBTB16&quot;, &quot;KLRD1&quot;,&quot;NCAM1&quot;, &quot;FCGR3A&quot;))) %&gt;% left_join(., genes, by=&quot;geneID&quot;) %&gt;% filter(gene != &quot;ENSG00000232995.RGS5&quot;) 
+
+DotPlot(seuratTcell, features = selGenes$gene) + RotatedAxis() + scale_color_viridis(option=&quot;T&quot;) + coord_flip() </code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code>VlnPlot(seuratTcell, features = &quot;ENSG00000166923.GREM1&quot;, pt.size = 0.1, cols = colclusterName) + ggtitle (&quot;GREM1&quot;)</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-22-1.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code>VlnPlot(seuratTcell, features = &quot;ENSG00000180875.GREM2&quot;, pt.size = 0.1, cols = colclusterName) + ggtitle (&quot;GREM2&quot;)</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-22-2.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code>VlnPlot(seuratTcell, features = &quot;ENSG00000125378.BMP4&quot;, pt.size = 0.1, cols = colclusterName) + ggtitle (&quot;BMP4&quot;)</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-22-3.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+</div>
+<div id="featureplots-gsea-tcells-grem2-grem1-bmp4"
+class="section level2">
+<h2>FeaturePlots GSEA Tcells: GREM2, GREM1, BMP4</h2>
+<pre class="r"><code>get_full_gene_name &lt;- function(gene, obj){
+  return(grep(gene,rownames(obj), value =TRUE))
+}
+get_full_gene_name(&quot;BMP4&quot;,seuratTcell) </code></pre>
+<pre><code>[1] &quot;ENSG00000125378.BMP4&quot;</code></pre>
+<pre class="r"><code>FeaturePlot(seuratTcell, features = &quot;ENSG00000125378.BMP4&quot;, pt.size = 1, cols = c(&quot;lightgrey&quot;, &quot;#BE3144&quot;))</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-23-1.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code>FeaturePlot(seuratTcell, features = get_full_gene_name(&quot;GREM1&quot;,seuratM) , pt.size = 1, cols = c(&quot;lightgrey&quot;, &quot;#BE3144&quot;))#</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-23-2.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code>FeaturePlot(seuratTcell, features = get_full_gene_name(&quot;GREM2&quot;,seuratM) , pt.size = 1, cols = c(&quot;lightgrey&quot;, &quot;#BE3144&quot;))</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-23-3.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+</div>
+<div id="feature-plots-gsea-lymphocyte-cluster-other-marker-genes"
+class="section level2">
+<h2>Feature Plots GSEA Lymphocyte Cluster: other marker genes</h2>
+<pre class="r"><code>FeaturePlot(seuratTcell, features = &quot;ENSG00000081237.PTPRC&quot;, pt.size = 1, cols = c(&quot;lightgrey&quot;, &quot;#BE3144&quot;))</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-24-1.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code>FeaturePlot(seuratTcell, features = &quot;ENSG00000010610.CD4&quot;, pt.size = 1, cols = c(&quot;lightgrey&quot;, &quot;#BE3144&quot;))</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-24-2.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code>FeaturePlot(seuratTcell, features = &quot;ENSG00000172116.CD8B&quot;, pt.size = 1, cols = c(&quot;lightgrey&quot;, &quot;#BE3144&quot;))</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-24-3.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code>FeaturePlot(seuratTcell, features = get_full_gene_name(&quot;CD8A&quot;, seuratTcell) , pt.size = 1, cols = c(&quot;lightgrey&quot;, &quot;#BE3144&quot;))# </code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-24-4.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code>FeaturePlot(seuratTcell, features = &quot;ENSG00000116824.CD2&quot;, pt.size = 1, cols = c(&quot;lightgrey&quot;, &quot;#BE3144&quot;))</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-24-5.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code>FeaturePlot(seuratTcell, features = &quot;ENSG00000167286.CD3D&quot;, pt.size = 1, cols = c(&quot;lightgrey&quot;, &quot;#BE3144&quot;))</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-24-6.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code>FeaturePlot(seuratTcell, features = &quot;ENSG00000198851.CD3E&quot;, pt.size = 1, cols = c(&quot;lightgrey&quot;, &quot;#BE3144&quot;))</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-24-7.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code>FeaturePlot(seuratTcell, features = get_full_gene_name(&quot;CXCR3&quot;,seuratTcell) , pt.size = 1, cols = c(&quot;lightgrey&quot;, &quot;#BE3144&quot;))# </code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-24-8.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code>FeaturePlot(seuratTcell, features = get_full_gene_name(&quot;STAT4&quot;,seuratTcell) , pt.size = 1, cols = c(&quot;lightgrey&quot;, &quot;#BE3144&quot;))# </code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-24-9.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code>FeaturePlot(seuratTcell, features = get_full_gene_name(&quot;IL12RB1&quot;,seuratTcell) , pt.size = 1, cols = c(&quot;lightgrey&quot;, &quot;#BE3144&quot;))#</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-24-10.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code>FeaturePlot(seuratTcell, features = get_full_gene_name(&quot;CCR6&quot;, seuratTcell) , pt.size = 1, cols = c(&quot;lightgrey&quot;, &quot;#BE3144&quot;))</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-24-11.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code>FeaturePlot(seuratTcell, features = get_full_gene_name(&quot;RORC&quot;, seuratTcell) , pt.size = 1, cols = c(&quot;lightgrey&quot;, &quot;#BE3144&quot;))</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-24-12.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code>FeaturePlot(seuratTcell, features = &quot;ENSG00000149294.NCAM1&quot;, pt.size = 1, cols = c(&quot;lightgrey&quot;, &quot;#BE3144&quot;))</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-24-13.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code>FeaturePlot(seuratTcell, features = get_full_gene_name(&quot;GZMB&quot;,seuratTcell) , pt.size = 1, cols = c(&quot;lightgrey&quot;, &quot;#BE3144&quot;))</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-24-14.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code>FeaturePlot(seuratTcell, features = get_full_gene_name(&quot;PRF1&quot;,seuratTcell) , pt.size = 1, cols = c(&quot;lightgrey&quot;, &quot;#BE3144&quot;))</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-24-15.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code>FeaturePlot(seuratTcell, features = get_full_gene_name(&quot;KIR3DL1&quot;,seuratTcell) , pt.size = 1, cols = c(&quot;lightgrey&quot;, &quot;#BE3144&quot;))# NK</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-24-16.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code>FeaturePlot(seuratTcell, features = get_full_gene_name(&quot;TXK&quot;,seuratTcell) , pt.size = 1, cols = c(&quot;lightgrey&quot;, &quot;#BE3144&quot;))# </code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-24-17.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code>FeaturePlot(seuratTcell, features = get_full_gene_name(&quot;KLRD1&quot;,seuratTcell) , pt.size = 1, cols = c(&quot;lightgrey&quot;, &quot;#BE3144&quot;)) # CD94</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-24-18.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code>FeaturePlot(seuratTcell, features = get_full_gene_name(&quot;FCGR3A&quot;,seuratTcell) , pt.size = 1, cols = c(&quot;lightgrey&quot;, &quot;#BE3144&quot;)) #CD16</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-24-19.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code>FeaturePlot(seuratTcell, features = get_full_gene_name(&quot;GZMB&quot;,seuratTcell) , pt.size = 1, cols = c(&quot;lightgrey&quot;, &quot;#BE3144&quot;))</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-24-20.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code>FeaturePlot(seuratTcell, features = &quot;ENSG00000189430.NCR1&quot;, pt.size = 1, cols = c(&quot;lightgrey&quot;, &quot;#BE3144&quot;))</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-24-21.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code>FeaturePlot(seuratTcell, features = &quot;ENSG00000162594.IL23R&quot;, pt.size = 1, cols = c(&quot;lightgrey&quot;, &quot;#BE3144&quot;))</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-24-22.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code>FeaturePlot(seuratTcell, features = &quot;ENSG00000138795.LEF1&quot;, pt.size = 1, cols = c(&quot;lightgrey&quot;, &quot;#BE3144&quot;))</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-24-23.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code>FeaturePlot(seuratTcell, features = &quot;ENSG00000109906.ZBTB16&quot;, pt.size = 1, cols = c(&quot;lightgrey&quot;, &quot;#BE3144&quot;))    </code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-24-24.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code>FeaturePlot(seuratTcell, features = &quot;ENSG00000165810.BTNL9&quot;, pt.size = 1, cols = c(&quot;lightgrey&quot;, &quot;#BE3144&quot;))</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-24-25.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code>FeaturePlot(seuratTcell, features = &quot;ENSG00000153029.MR1&quot;, pt.size = 1, cols = c(&quot;lightgrey&quot;, &quot;#BE3144&quot;))</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-24-26.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code>FeaturePlot(seuratTcell, features = get_full_gene_name(&quot;TRAJ33&quot;,seuratTcell) , pt.size = 1, cols = c(&quot;lightgrey&quot;, &quot;#BE3144&quot;))#</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-24-27.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code>FeaturePlot(seuratTcell, features = get_full_gene_name(&quot;SLC4A10&quot;,seuratTcell) , pt.size = 1, cols = c(&quot;lightgrey&quot;, &quot;#BE3144&quot;))</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-24-28.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code> #yd Tcells
+FeaturePlot(seuratTcell, features = get_full_gene_name(&quot;TRDV2&quot;,seuratTcell) , pt.size = 1, cols = c(&quot;lightgrey&quot;, &quot;#BE3144&quot;)) # </code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-24-29.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code>FeaturePlot(seuratTcell, features = get_full_gene_name(&quot;TRGC1&quot;,seuratTcell) , pt.size = 1, cols = c(&quot;lightgrey&quot;, &quot;#BE3144&quot;))</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-24-30.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code>get_features &lt;- function(gene_symbols, seurat_obj) {
+  rn &lt;- rownames(seurat_obj)
+  matched &lt;- c()
+  for (g in gene_symbols) {
+    hit &lt;- grep(paste0(&quot;\\.&quot;, g, &quot;$&quot;), rn, value = TRUE)  
+    if (length(hit) &gt; 0) {
+      matched &lt;- c(matched, hit[1])  
+    } else {
+      message(&quot;Gene not found: &quot;, g)
+    }
+  }
+  return(matched)
+}
+
+th17_genes &lt;- c(&quot;RORC&quot;, &quot;IL23R&quot;, &quot;CD3E&quot;, &quot;CCR6&quot;)
+
+
+th17_features &lt;- get_features(th17_genes, seuratTcell)
+print(th17_features)  </code></pre>
+<pre><code>[1] &quot;ENSG00000143365.RORC&quot;  &quot;ENSG00000162594.IL23R&quot; &quot;ENSG00000198851.CD3E&quot;  &quot;ENSG00000112486.CCR6&quot; </code></pre>
+<pre class="r"><code># Th17 module score
+seuratTcell &lt;- AddModuleScore(
+  object = seuratTcell,
+  features = list(th17_features),
+  name = &quot;Th17_Score&quot;,
+  search = FALSE)
+
+FeaturePlot(seuratTcell,features = &quot;Th17_Score1&quot;, pt.size = 1, cols = c(&quot;lightgrey&quot;, &quot;#BE3144&quot;))</code></pre>
+<img src="figure/Sarcoidosis%20GREM2%20expression.Rmd/unnamed-chunk-25-1.png" width="672" style="display: block; margin: auto;" />
+<div class="alert alert-warning">
+<strong>Warning!</strong> The custom <code>fig.path</code> you set was
+ignored by workflowr.
+</div>
+<pre class="r"><code>date()</code></pre>
+<pre><code>[1] &quot;Sat Oct  4 19:04:14 2025&quot;</code></pre>
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.4.2 (2024-10-31)
+Platform: aarch64-apple-darwin20
+Running under: macOS Sequoia 15.6.1
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/lib/libRblas.0.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.0
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+time zone: Europe/Zurich
+tzcode source: internal
+
+attached base packages:
+[1] grid      stats4    stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] future_1.67.0               workflowr_1.7.2             pathview_1.46.0            
+ [4] wordcloud_2.6               textshaping_1.0.3           EnhancedVolcano_1.24.0     
+ [7] ggrepel_0.9.6               RColorBrewer_1.1-3          NCmisc_1.2.0               
+[10] VennDiagram_1.7.3           futile.logger_1.4.3         ggupset_0.4.1              
+[13] gridExtra_2.3               DOSE_4.0.1                  enrichplot_1.26.6          
+[16] msigdbr_25.1.1              org.Hs.eg.db_3.20.0         AnnotationDbi_1.68.0       
+[19] clusterProfiler_4.14.6      multtest_2.62.0             metap_1.12                 
+[22] scater_1.34.1               scuttle_1.16.0              destiny_3.20.0             
+[25] circlize_0.4.16             muscat_1.20.0               viridis_0.6.5              
+[28] viridisLite_0.4.2           lubridate_1.9.4             forcats_1.0.1              
+[31] stringr_1.5.2               purrr_1.1.0                 readr_2.1.5                
+[34] tidyr_1.3.1                 tibble_3.3.0                tidyverse_2.0.0            
+[37] dplyr_1.1.4                 SingleCellExperiment_1.28.1 SummarizedExperiment_1.36.0
+[40] Biobase_2.66.0              GenomicRanges_1.58.0        GenomeInfoDb_1.42.3        
+[43] IRanges_2.40.1              S4Vectors_0.44.0            BiocGenerics_0.52.0        
+[46] MatrixGenerics_1.18.1       matrixStats_1.5.0           pheatmap_1.0.13            
+[49] ggpubr_0.6.1                ggplot2_4.0.0               Seurat_5.3.0               
+[52] SeuratObject_5.2.0          sp_2.2-0                   
+
+loaded via a namespace (and not attached):
+  [1] graph_1.84.1             igraph_2.1.4             ica_1.0-3               
+  [4] plotly_4.11.0            Formula_1.2-5            zlibbioc_1.52.0         
+  [7] tidyselect_1.2.1         bit_4.6.0                doParallel_1.0.17       
+ [10] clue_0.3-66              lattice_0.22-7           rjson_0.2.23            
+ [13] blob_1.2.4               S4Arrays_1.6.0           pbkrtest_0.5.5          
+ [16] parallel_4.4.2           png_0.1-8                plotrix_3.8-4           
+ [19] cli_3.6.5                ggplotify_0.1.3          goftest_1.2-3           
+ [22] VIM_6.2.6                variancePartition_1.36.3 BiocNeighbors_2.0.1     
+ [25] uwot_0.2.3               curl_7.0.0               mime_0.13               
+ [28] evaluate_1.0.5           tidytree_0.4.6           ComplexHeatmap_2.22.0   
+ [31] stringi_1.8.7            backports_1.5.0          XML_3.99-0.19           
+ [34] lmerTest_3.1-3           qqconf_1.3.2             httpuv_1.6.16           
+ [37] magrittr_2.0.4           rappdirs_0.3.3           splines_4.4.2           
+ [40] sctransform_0.4.2        ggbeeswarm_0.7.2         DBI_1.2.3               
+ [43] jquerylib_0.1.4          smoother_1.3             withr_3.0.2             
+ [46] git2r_0.36.2             corpcor_1.6.10           systemfonts_1.2.3       
+ [49] reformulas_0.4.1         class_7.3-23             rprojroot_2.1.1         
+ [52] lmtest_0.9-40            formatR_1.14             htmlwidgets_1.6.4       
+ [55] fs_1.6.6                 labeling_0.4.3           fANCOVA_0.6-1           
+ [58] SparseArray_1.6.2        DESeq2_1.46.0            ranger_0.17.0           
+ [61] DEoptimR_1.1-4           reticulate_1.43.0        hexbin_1.28.5           
+ [64] zoo_1.8-14               XVector_0.46.0           knitr_1.50              
+ [67] ggplot.multistats_1.0.1  UCSC.utils_1.2.0         RhpcBLASctl_0.23-42     
+ [70] timechange_0.3.0         foreach_1.5.2            patchwork_1.3.2         
+ [73] caTools_1.18.3           data.table_1.17.8        ggtree_3.14.0           
+ [76] R.oo_1.27.1              RSpectra_0.16-2          irlba_2.3.5.1           
+ [79] ggrastr_1.0.2            fastDummies_1.7.5        gridGraphics_0.5-1      
+ [82] lazyeval_0.2.2           yaml_2.3.10              survival_3.8-3          
+ [85] scattermore_1.2          crayon_1.5.3             RcppAnnoy_0.0.22        
+ [88] Rgraphviz_2.50.0         progressr_0.16.0         later_1.4.4             
+ [91] ggridges_0.5.7           codetools_0.2-20         GlobalOptions_0.1.2     
+ [94] aod_1.3.3                KEGGREST_1.46.0          Rtsne_0.17              
+ [97] shape_1.4.6.1            limma_3.62.2             estimability_1.5.1      
+[100] pkgconfig_2.0.3          KEGGgraph_1.66.0         TMB_1.9.17              
+[103] spatstat.univar_3.1-4    mathjaxr_1.8-0           getPass_0.2-4           
+[106] EnvStats_3.1.0           aplot_0.2.9              scatterplot3d_0.3-44    
+[109] spatstat.sparse_3.1-0    ape_5.8-1                xtable_1.8-4            
+[112] car_3.1-3                plyr_1.8.9               httr_1.4.7              
+[115] rbibutils_2.3            tools_4.4.2              globals_0.18.0          
+[118] beeswarm_0.4.0           broom_1.0.10             nlme_3.1-168            
+[121] lambda.r_1.2.4           assertthat_0.2.1         lme4_1.1-37             
+[124] digest_0.6.37            numDeriv_2016.8-1.1      Matrix_1.7-4            
+[127] farver_2.1.2             tzdb_0.5.0               remaCor_0.0.20          
+[130] reshape2_1.4.4           yulab.utils_0.2.1        glue_1.8.0              
+[133] cachem_1.1.0             polyclip_1.10-7          generics_0.1.4          
+[136] Biostrings_2.74.1        mvtnorm_1.3-3            parallelly_1.45.1       
+[139] mnormt_2.1.1             statmod_1.5.0            RcppHNSW_0.6.0          
+[142] ScaledMatrix_1.14.0      carData_3.0-5            minqa_1.2.8             
+[145] pbapply_1.7-4            spam_2.11-1              gson_0.1.0              
+[148] utf8_1.2.6               gtools_3.9.5             ggsignif_0.6.4          
+[151] RcppEigen_0.3.4.0.2      shiny_1.11.1             GenomeInfoDbData_1.2.13 
+[154] glmmTMB_1.1.12           R.utils_2.13.0           RCurl_1.98-1.17         
+[157] memoise_2.0.1            rmarkdown_2.29           scales_1.4.0            
+[160] R.methodsS3_1.8.2        RANN_2.6.2               spatstat.data_3.1-8     
+[163] rstudioapi_0.17.1        whisker_0.4.1            cluster_2.1.8.1         
+[166] mutoss_0.1-13            spatstat.utils_3.2-0     hms_1.1.3               
+[169] fitdistrplus_1.2-4       cowplot_1.2.0            colorspace_2.1-2        
+[172] rlang_1.1.6              xts_0.14.1               dotCall64_1.2           
+[175] ggtangle_0.0.7           laeken_0.5.3             mgcv_1.9-3              
+[178] xfun_0.53                coda_0.19-4.1            e1071_1.7-16            
+[181] TH.data_1.1-4            iterators_1.0.14         emmeans_1.11.2-8        
+[184] abind_1.4-8              GOSemSim_2.32.0          treeio_1.30.0           
+[187] ps_1.9.1                 futile.options_1.0.1     bitops_1.0-9            
+[190] Rdpack_2.6.4             promises_1.3.3           RSQLite_2.4.3           
+[193] qvalue_2.38.0            sandwich_3.1-1           fgsea_1.32.4            
+[196] DelayedArray_0.32.0      proxy_0.4-27             GO.db_3.20.0            
+[199] compiler_4.4.2           prettyunits_1.2.0        boot_1.3-32             
+[202] beachmat_2.22.0          listenv_0.9.1            Rcpp_1.1.0              
+[205] edgeR_4.4.2              BiocSingular_1.22.0      tensor_1.5.1            
+[208] MASS_7.3-65              progress_1.2.3           BiocParallel_1.40.2     
+[211] babelgene_22.9           spatstat.random_3.4-2    R6_2.6.1                
+[214] fastmap_1.2.0            multcomp_1.4-28          fastmatch_1.1-6         
+[217] rstatix_0.7.2            vipor_0.4.7              TTR_0.24.4              
+[220] ROCR_1.0-11              TFisher_0.2.0            rsvd_1.0.5              
+[223] vcd_1.4-13               nnet_7.3-20              gtable_0.3.6            
+[226] KernSmooth_2.23-26       miniUI_0.1.2             deldir_2.0-4            
+[229] htmltools_0.5.8.1        ggthemes_5.1.0           bit64_4.6.0-1           
+[232] spatstat.explore_3.5-3   lifecycle_1.0.4          blme_1.0-6              
+[235] S7_0.2.0                 processx_3.8.6           callr_3.7.6             
+[238] nloptr_2.2.1             sass_0.4.10              vctrs_0.6.5             
+[241] robustbase_0.99-6        spatstat.geom_3.6-0      sn_2.1.1                
+[244] ggfun_0.2.0              future.apply_1.20.0      bslib_0.9.0             
+[247] pillar_1.11.1            gplots_3.2.0             pcaMethods_1.98.0       
+[250] locfit_1.5-9.12          jsonlite_2.0.0           GetoptLong_1.0.5        </code></pre>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.4.2 (2024-10-31)
+Platform: aarch64-apple-darwin20
+Running under: macOS Sequoia 15.6.1
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/lib/libRblas.0.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.0
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+time zone: Europe/Zurich
+tzcode source: internal
+
+attached base packages:
+[1] grid      stats4    stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] future_1.67.0               workflowr_1.7.2             pathview_1.46.0            
+ [4] wordcloud_2.6               textshaping_1.0.3           EnhancedVolcano_1.24.0     
+ [7] ggrepel_0.9.6               RColorBrewer_1.1-3          NCmisc_1.2.0               
+[10] VennDiagram_1.7.3           futile.logger_1.4.3         ggupset_0.4.1              
+[13] gridExtra_2.3               DOSE_4.0.1                  enrichplot_1.26.6          
+[16] msigdbr_25.1.1              org.Hs.eg.db_3.20.0         AnnotationDbi_1.68.0       
+[19] clusterProfiler_4.14.6      multtest_2.62.0             metap_1.12                 
+[22] scater_1.34.1               scuttle_1.16.0              destiny_3.20.0             
+[25] circlize_0.4.16             muscat_1.20.0               viridis_0.6.5              
+[28] viridisLite_0.4.2           lubridate_1.9.4             forcats_1.0.1              
+[31] stringr_1.5.2               purrr_1.1.0                 readr_2.1.5                
+[34] tidyr_1.3.1                 tibble_3.3.0                tidyverse_2.0.0            
+[37] dplyr_1.1.4                 SingleCellExperiment_1.28.1 SummarizedExperiment_1.36.0
+[40] Biobase_2.66.0              GenomicRanges_1.58.0        GenomeInfoDb_1.42.3        
+[43] IRanges_2.40.1              S4Vectors_0.44.0            BiocGenerics_0.52.0        
+[46] MatrixGenerics_1.18.1       matrixStats_1.5.0           pheatmap_1.0.13            
+[49] ggpubr_0.6.1                ggplot2_4.0.0               Seurat_5.3.0               
+[52] SeuratObject_5.2.0          sp_2.2-0                   
+
+loaded via a namespace (and not attached):
+  [1] graph_1.84.1             igraph_2.1.4             ica_1.0-3               
+  [4] plotly_4.11.0            Formula_1.2-5            zlibbioc_1.52.0         
+  [7] tidyselect_1.2.1         bit_4.6.0                doParallel_1.0.17       
+ [10] clue_0.3-66              lattice_0.22-7           rjson_0.2.23            
+ [13] blob_1.2.4               S4Arrays_1.6.0           pbkrtest_0.5.5          
+ [16] parallel_4.4.2           png_0.1-8                plotrix_3.8-4           
+ [19] cli_3.6.5                ggplotify_0.1.3          goftest_1.2-3           
+ [22] VIM_6.2.6                variancePartition_1.36.3 BiocNeighbors_2.0.1     
+ [25] uwot_0.2.3               curl_7.0.0               mime_0.13               
+ [28] evaluate_1.0.5           tidytree_0.4.6           ComplexHeatmap_2.22.0   
+ [31] stringi_1.8.7            backports_1.5.0          XML_3.99-0.19           
+ [34] lmerTest_3.1-3           qqconf_1.3.2             httpuv_1.6.16           
+ [37] magrittr_2.0.4           rappdirs_0.3.3           splines_4.4.2           
+ [40] sctransform_0.4.2        ggbeeswarm_0.7.2         DBI_1.2.3               
+ [43] jquerylib_0.1.4          smoother_1.3             withr_3.0.2             
+ [46] git2r_0.36.2             corpcor_1.6.10           systemfonts_1.2.3       
+ [49] reformulas_0.4.1         class_7.3-23             rprojroot_2.1.1         
+ [52] lmtest_0.9-40            formatR_1.14             htmlwidgets_1.6.4       
+ [55] fs_1.6.6                 labeling_0.4.3           fANCOVA_0.6-1           
+ [58] SparseArray_1.6.2        DESeq2_1.46.0            ranger_0.17.0           
+ [61] DEoptimR_1.1-4           reticulate_1.43.0        hexbin_1.28.5           
+ [64] zoo_1.8-14               XVector_0.46.0           knitr_1.50              
+ [67] ggplot.multistats_1.0.1  UCSC.utils_1.2.0         RhpcBLASctl_0.23-42     
+ [70] timechange_0.3.0         foreach_1.5.2            patchwork_1.3.2         
+ [73] caTools_1.18.3           data.table_1.17.8        ggtree_3.14.0           
+ [76] R.oo_1.27.1              RSpectra_0.16-2          irlba_2.3.5.1           
+ [79] ggrastr_1.0.2            fastDummies_1.7.5        gridGraphics_0.5-1      
+ [82] lazyeval_0.2.2           yaml_2.3.10              survival_3.8-3          
+ [85] scattermore_1.2          crayon_1.5.3             RcppAnnoy_0.0.22        
+ [88] Rgraphviz_2.50.0         progressr_0.16.0         later_1.4.4             
+ [91] ggridges_0.5.7           codetools_0.2-20         GlobalOptions_0.1.2     
+ [94] aod_1.3.3                KEGGREST_1.46.0          Rtsne_0.17              
+ [97] shape_1.4.6.1            limma_3.62.2             estimability_1.5.1      
+[100] pkgconfig_2.0.3          KEGGgraph_1.66.0         TMB_1.9.17              
+[103] spatstat.univar_3.1-4    mathjaxr_1.8-0           getPass_0.2-4           
+[106] EnvStats_3.1.0           aplot_0.2.9              scatterplot3d_0.3-44    
+[109] spatstat.sparse_3.1-0    ape_5.8-1                xtable_1.8-4            
+[112] car_3.1-3                plyr_1.8.9               httr_1.4.7              
+[115] rbibutils_2.3            tools_4.4.2              globals_0.18.0          
+[118] beeswarm_0.4.0           broom_1.0.10             nlme_3.1-168            
+[121] lambda.r_1.2.4           assertthat_0.2.1         lme4_1.1-37             
+[124] digest_0.6.37            numDeriv_2016.8-1.1      Matrix_1.7-4            
+[127] farver_2.1.2             tzdb_0.5.0               remaCor_0.0.20          
+[130] reshape2_1.4.4           yulab.utils_0.2.1        glue_1.8.0              
+[133] cachem_1.1.0             polyclip_1.10-7          generics_0.1.4          
+[136] Biostrings_2.74.1        mvtnorm_1.3-3            parallelly_1.45.1       
+[139] mnormt_2.1.1             statmod_1.5.0            RcppHNSW_0.6.0          
+[142] ScaledMatrix_1.14.0      carData_3.0-5            minqa_1.2.8             
+[145] pbapply_1.7-4            spam_2.11-1              gson_0.1.0              
+[148] utf8_1.2.6               gtools_3.9.5             ggsignif_0.6.4          
+[151] RcppEigen_0.3.4.0.2      shiny_1.11.1             GenomeInfoDbData_1.2.13 
+[154] glmmTMB_1.1.12           R.utils_2.13.0           RCurl_1.98-1.17         
+[157] memoise_2.0.1            rmarkdown_2.29           scales_1.4.0            
+[160] R.methodsS3_1.8.2        RANN_2.6.2               spatstat.data_3.1-8     
+[163] rstudioapi_0.17.1        whisker_0.4.1            cluster_2.1.8.1         
+[166] mutoss_0.1-13            spatstat.utils_3.2-0     hms_1.1.3               
+[169] fitdistrplus_1.2-4       cowplot_1.2.0            colorspace_2.1-2        
+[172] rlang_1.1.6              xts_0.14.1               dotCall64_1.2           
+[175] ggtangle_0.0.7           laeken_0.5.3             mgcv_1.9-3              
+[178] xfun_0.53                coda_0.19-4.1            e1071_1.7-16            
+[181] TH.data_1.1-4            iterators_1.0.14         emmeans_1.11.2-8        
+[184] abind_1.4-8              GOSemSim_2.32.0          treeio_1.30.0           
+[187] ps_1.9.1                 futile.options_1.0.1     bitops_1.0-9            
+[190] Rdpack_2.6.4             promises_1.3.3           RSQLite_2.4.3           
+[193] qvalue_2.38.0            sandwich_3.1-1           fgsea_1.32.4            
+[196] DelayedArray_0.32.0      proxy_0.4-27             GO.db_3.20.0            
+[199] compiler_4.4.2           prettyunits_1.2.0        boot_1.3-32             
+[202] beachmat_2.22.0          listenv_0.9.1            Rcpp_1.1.0              
+[205] edgeR_4.4.2              BiocSingular_1.22.0      tensor_1.5.1            
+[208] MASS_7.3-65              progress_1.2.3           BiocParallel_1.40.2     
+[211] babelgene_22.9           spatstat.random_3.4-2    R6_2.6.1                
+[214] fastmap_1.2.0            multcomp_1.4-28          fastmatch_1.1-6         
+[217] rstatix_0.7.2            vipor_0.4.7              TTR_0.24.4              
+[220] ROCR_1.0-11              TFisher_0.2.0            rsvd_1.0.5              
+[223] vcd_1.4-13               nnet_7.3-20              gtable_0.3.6            
+[226] KernSmooth_2.23-26       miniUI_0.1.2             deldir_2.0-4            
+[229] htmltools_0.5.8.1        ggthemes_5.1.0           bit64_4.6.0-1           
+[232] spatstat.explore_3.5-3   lifecycle_1.0.4          blme_1.0-6              
+[235] S7_0.2.0                 processx_3.8.6           callr_3.7.6             
+[238] nloptr_2.2.1             sass_0.4.10              vctrs_0.6.5             
+[241] robustbase_0.99-6        spatstat.geom_3.6-0      sn_2.1.1                
+[244] ggfun_0.2.0              future.apply_1.20.0      bslib_0.9.0             
+[247] pillar_1.11.1            gplots_3.2.0             pcaMethods_1.98.0       
+[250] locfit_1.5-9.12          jsonlite_2.0.0           GetoptLong_1.0.5        </code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

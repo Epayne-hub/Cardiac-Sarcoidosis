@@ -1,0 +1,546 @@
+---
+title: "Sarcoidosis Clusters and annotations"
+author: "Emily Payne"
+date: "2025-06-05"
+output: html_document
+---
+
+```{r setup, include = FALSE, warning = FALSE, message = FALSE}
+
+options (width = 100)
+knitr::opts_chunk$set(warning = FALSE, echo = TRUE, message = FALSE, dev = c("png", "pdf"))
+seed <- 1234
+
+```
+
+
+```{r load libraries, echo = F}
+
+suppressPackageStartupMessages({
+  library(Seurat)
+  library(ggpubr)
+  library(pheatmap)
+  library(SingleCellExperiment)
+  library(dplyr)
+  library(tidyverse)
+  library(viridis)
+  library(muscat)
+  library(circlize)
+  library(destiny)
+  library(scater)
+  library(metap)
+  library(multtest)
+  library(clusterProfiler)
+  library(org.Hs.eg.db)
+  library(msigdbr)
+  library(enrichplot)
+  library(DOSE)
+  library(grid)
+  library(gridExtra)
+  library(ggupset)
+  library(VennDiagram)
+  library(NCmisc)
+  library(RColorBrewer)
+  library(EnhancedVolcano)
+  library(textshaping)
+  library(wordcloud)
+  library(pathview)
+  library(workflowr)
+  library(future)
+  library(ggpubr)
+  library(ggplot2)
+})
+
+```
+
+
+
+
+```{r echo = F}
+seuratM <- readRDS("~/Documents/Github/Cardiac Sarcoidosis/data/Merged/Sarcoidosis_vs_DonorHeart_v2.rds")
+"data/Merged/Sarcoidosis_vs_DonorHeart_v2.rds"
+```
+
+
+```{r, echo = FALSE}
+
+seuratM <- subset (seuratM, clusterName %in% c("CM", "Fb1","PeriFb", "VSMC", "BEC1","BEC2", "NC1", "TRM", "inflMph","Lymphocytes"))
+
+table(seuratM$orig.ident)
+table(seuratM$clusterName)
+
+```
+# Nuclei number per condition
+```{r}
+
+table(seuratM$pat_sub)
+cell_count <- data.frame(table(seuratM$pat_sub))
+colnames(cell_count) <- c("Condition", "Freq")
+hsize <- 1.5
+
+ggplot(cell_count, aes(x = hsize, y = Freq, fill = Condition)) +
+  geom_col(color = "white") +
+  coord_polar(theta = "y") +
+  xlim(c(0.2, hsize + 0.5)) +
+  theme_void() +
+  ggtitle("cell number") +
+  theme(plot.title = element_text(hjust = 0.5, size = 15)) +
+  geom_text(aes(label = Freq), position = position_stack(vjust = 0.5))
+
+
+```
+# Nuclei number per patient
+```{r}
+table(seuratM$patient)
+
+cellcount_pat <- data.frame(table(seuratM$patient))
+colnames(cellcount_pat) <- c("patient", "Freq")
+hsize <- 1.5
+
+
+ggplot(cellcount_pat, aes(x = patient, y = Freq, fill = patient)) +
+  geom_col(color = "white") +  
+  theme_classic() +  
+  ggtitle("Nuclei Number by Patient") +
+  theme(plot.title = element_text(hjust = 0.5, size = 15)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
+  geom_text(aes(label = Freq), vjust = -0.3, size = 3) +  
+  xlab("Patients") +  
+  ylab("Frequency (Nuclei Count)") +
+  theme(legend.position = "none")
+
+
+
+```
+
+# Nuclei number per Cluster 
+```{r, fig.width = 12, fig.height = 6}
+
+colclusterName <- c("#f4a582", "#FEE08B", "#3288BD", "#253494",  "#01665e", "#66C2A5", "#355C7D", "#a6bddb", "#fde0dd", "#dd1c77")
+
+names(colclusterName) <- c("CM", "Fb1","PeriFb", "VSMC", "BEC1","BEC2", "NC1", "TRM", "inflMph","Lymphocytes")
+
+table(seuratM$clusterName)
+
+Idents(seuratM) <- seuratM$clusterName
+
+cellcount <- data.frame(table(seuratM$clusterName))
+colnames(cellcount) <- c("clusterName", "Freq")
+hsize <- 1.5
+
+ggplot(cellcount, aes(x = clusterName, y = Freq, fill = clusterName)) +  
+  geom_col(color = "white") + 
+  theme_classic() +  
+  ggtitle("Nuclei Number per Cluster") +
+  theme(plot.title = element_text(hjust = 0.5, size = 15)) +
+  geom_text(aes(label = Freq), vjust = -0.3, size = 3) +  
+  xlab("Cluster Names") +  
+  ylab("Absolute Cell Nuclei Count") +
+  scale_fill_manual(values = colclusterName)  
+
+
+```
+
+
+
+
+
+
+## Nuclei count per celltype per condition
+
+```{r}
+
+seuratM$pat_sub <- factor(seuratM$pat_sub, levels = c("DonorHeart", "Sarcoidosis"))
+
+
+colpat_sub <- c("DonorHeart" = "#355C7D", "Sarcoidosis" = "#dfc27d")
+
+
+dat_counts <- seuratM@meta.data %>%
+  group_by(patient_pat_sub, pat_sub, clusterName) %>%
+  summarise(cnt = n(), .groups = "drop")
+
+dat_totals <- seuratM@meta.data %>%
+  group_by(patient_pat_sub) %>%
+  summarise(total_cells = n(), .groups = "drop")
+
+dat_rel <- dat_counts %>%
+  left_join(dat_totals, by = "patient_pat_sub") %>%
+  mutate(rel_abundance = cnt / total_cells)
+
+
+pvals <- dat_rel %>%
+  group_by(clusterName) %>%
+  summarise(p_val = wilcox.test(rel_abundance ~ pat_sub)$p.value) %>%
+  mutate(p_label = sprintf("p = %.3f", p_val))
+
+
+y_max <- dat_rel %>% 
+  group_by(clusterName) %>%
+  summarise(y_pos = max(rel_abundance))
+
+
+pvals <- left_join(pvals, y_max, by = "clusterName")
+
+ggbarplot(dat_rel,
+          x = "clusterName",
+          y = "rel_abundance",
+          fill = "pat_sub",
+          palette = colpat_sub,
+          add = c("mean_se"),
+          position = position_dodge(0.8),
+          xlab = "Cluster (Cell type)",
+          ylab = "Relative abundance",
+          legend.title = "Condition") + rotate_x_text(angle = 45) + theme_classic() +
+  
+  ggrepel::geom_text_repel(data = pvals, aes(x = clusterName, y = y_pos * 1.05, label = p_label), inherit.aes = FALSE,
+                           size = 3, direction = "y",nudge_y = 0.01, segment.size = 0.2, box.padding = 0.5, point.padding = 0.5)
+
+
+
+```
+
+
+
+## Nuclei number per cluster per patient
+```{r}
+table(seuratM$clusterName, seuratM$pat_sub)
+```
+
+
+# UMAPs
+```{r, echo = F}
+
+colclusterName <- c("#f4a582", "#FEE08B", "#3288BD", "#253494",  "#01665e", "#66C2A5", "#355C7D", "#a6bddb", "#fde0dd", "#dd1c77")
+
+names(colclusterName) <- c("CM", "Fb1","PeriFb", "VSMC", "BEC1","BEC2", "NC1", "TRM", "inflMph","Lymphocytes")
+
+seuratM$clusterName <- factor(seuratM$clusterName, levels=c("CM", "Fb1", "PeriFb", "VSMC", "BEC1","BEC2", "NC1", "TRM", "inflMph","Lymphocytes"))
+
+Idents(seuratM) <- seuratM$clusterName
+DimPlot(seuratM, reduction = "umap",label = TRUE, cols = colclusterName, repel = TRUE, pt.size = 0.01)
+
+                  
+
+```
+
+
+```{r}
+
+
+Idents(seuratM) <- seuratM$pat_sub
+DimPlot(seuratM, reduction = "umap",label = F, repel = TRUE, cols = colpat_sub, pt.size = 0.001)
+
+```
+
+
+```{r}
+
+Idents(seuratM) <- seuratM$patient
+DimPlot(seuratM, reduction = "umap",label = F, repel = TRUE, pt.size = 0.001)
+
+```
+
+
+
+# Heatmap with Marker Genes
+```{r, fig.height = 8}
+
+Idents(seuratM) <- seuratM$clusterName
+
+
+genes <- data.frame(gene=rownames(seuratM)) %>% 
+  mutate(geneID=gsub("^.*\\.", "", gene))
+
+selGenes <- data.frame(geneID=rev(c("TTN", "MYBPC3", "RYR2", "TNNT2", "COL6A3", "DCN",  "FBN1", "C7", "PDGFRA", "PDGFRB", "RGS5", "NOTCH3", "MYH11", "ACTA2","PECAM1", "VWF", "EGFL7", "POSTN", "ITGA10", "NRXN1", "ANK3", "PTPRZ1", "CNTN2", "SNAP25", "ICAM1", "CD163", "LYVE1", "MRC1", "SIGLEC1", "STAB1", "CSF1R","MERTK", "SEMA4A", "HLA-DQB1", "CCR2", "IGHM", "GZMB", "IFNG", "IL7R","CD3E", "PTPRC", "CD2", "CD3E"))) %>% left_join(., genes, by="geneID") %>% filter(gene != "ENSG00000232995.RGS5") 
+
+
+avgHeatmap <- function(seuratM, selGenes, colVecIdent, colVecCond=NULL,
+                       ordVec=NULL, gapVecR=NULL, gapVecC=NULL,cc=FALSE,
+                       cr=FALSE, condCol=FALSE){
+  selGenes <- selGenes$gene
+  
+  clusterAssigned <- as.data.frame(Idents(seuratM)) %>%
+  dplyr::mutate(cell=rownames(.))
+  colnames(clusterAssigned)[1] <- "ident"
+  seuratDat <- GetAssayData(seuratM)
+  
+
+  genes <- data.frame(gene=rownames(seuratM)) %>% 
+    mutate(geneID=gsub("^.*\\.", "", gene)) %>% filter(geneID %in% selGenes)
+
+  logNormExpres <- as.data.frame(t(as.matrix(
+    seuratDat[which(rownames(seuratDat) %in% genes$gene),])))
+  logNormExpres <- logNormExpres %>% dplyr::mutate(cell=rownames(.)) %>%
+    dplyr::left_join(.,clusterAssigned, by=c("cell")) %>%
+    dplyr::select(-cell) %>% dplyr::group_by(ident) %>%
+    dplyr::summarise_all(mean)
+  logNormExpresMa <- logNormExpres %>% dplyr::select(-ident) %>% as.matrix()
+  rownames(logNormExpresMa) <- logNormExpres$ident
+  logNormExpresMa <- t(logNormExpresMa)
+  rownames(logNormExpresMa) <- gsub("^.*?\\.","",rownames(logNormExpresMa))
+  
+  ind <- apply(logNormExpresMa, 1, sd) == 0
+  logNormExpresMa <- logNormExpresMa[!ind,]
+  genes <- genes[!ind,]
+
+
+  annotation_col <- as.data.frame(gsub("(^.*?_)","",
+                                       colnames(logNormExpresMa)))%>%
+    dplyr::mutate(celltype=gsub("(_.*$)","",colnames(logNormExpresMa)))
+  colnames(annotation_col)[1] <- "col1"
+  annotation_col <- annotation_col %>%
+    dplyr::mutate(cond = gsub("(^[0-9]_?)","",col1)) %>%
+    dplyr::select(cond, celltype)
+  rownames(annotation_col) <- colnames(logNormExpresMa) 
+
+  ann_colors = list(
+      celltype=colVec)
+  if(is.null(ann_colors$cond)){
+    annotation_col$cond <- NULL
+  }
+  
+  logNormExpresMa <- logNormExpresMa[selGenes,]
+  if(is.null(ordVec)){
+  ordVec <- levels(seuratM)
+  ordVec <- c("CM", "Fb1", "PeriFb", "VSMC", "BEC1","BEC2", "NC1", "TRM", "inflMph","Lymphocytes")
+  }
+  logNormExpresMa <- logNormExpresMa[,ordVec]
+
+  pheatmap(logNormExpresMa, scale="row" ,treeheight_row = 0,cluster_rows = cr, 
+         cluster_cols = cc, color = colorRampPalette(c("#2166AC", "#F7F7F7", "#B2182B"))(50),
+         annotation_col = annotation_col, cellwidth=15, cellheight=10,
+         annotation_colors = ann_colors, gaps_row = gapVecR, gaps_col = gapVecC)
+}
+
+genesPlot <- data.frame(gene=c("TTN", "MYBPC3", "RYR2", "TNNT2", "COL6A3", "DCN",  "FBN1", "C7", "PDGFRA", "PDGFRB", "RGS5", "NOTCH3", "MYH11", "ACTA2","PECAM1", "VWF", "EGFL7", "POSTN", "ITGA10", "NRXN1", "ANK3", "PTPRZ1", "CNTN2", "ICAM1", "CD163", "LYVE1", "MRC1", "SIGLEC1", "STAB1", "CSF1R","MERTK", "SEMA4A", "HLA-DQB1", "CCR2", "IGHM", "GZMB", "IFNG", "IL7R","CD3E", "PTPRC", "CD2"))
+
+
+levels(seuratM)
+
+
+colVec <- colclusterName
+
+# colVec <- c(colPal, colPal, colPal)
+# colVec <- c("blue", "red")
+
+avgHeatmap(seuratM, selGenes = genesPlot, colVecIdent = colVec)
+
+
+
+
+```
+
+
+# Relative abundance per disease condition
+```{r Relative abundance per disease condition}
+
+datList <- NULL
+for(con in unique(seuratM$pat_sub)){
+  seuratSub <- subset(seuratM, pat_sub==con)
+  print(dim(seuratSub))
+  dat_con <- as.data.frame(table(seuratSub$clusterName)) %>%
+  mutate(percent=Freq/ncol(seuratSub)) %>% mutate(diseaseCond=con)
+  datList[[con]] <- dat_con
+  
+}
+
+dat_all <- do.call("rbind", datList)
+
+order_patsub <- c("DonorHeart", "Sarcoidosis")
+
+ggbarplot(dat_all, x = "diseaseCond", y = "percent", fill = "Var1", palette = colclusterName, legend = "right", legend.titel = "cluster", xlab = "condition", ylab = "frequency") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  scale_x_discrete(limits = order_patsub)
+
+```
+
+# Relative abundance per patient
+```{r Relative abundance per patient, echo = FALSE}
+
+
+datList <- NULL
+for(con in unique(seuratM$patient)){
+  seuratMSub <- subset(seuratM, patient==con)
+  print(dim(seuratMSub))
+  dat_con <- as.data.frame(table(seuratMSub$clusterName)) %>%
+  mutate(percent=Freq/ncol(seuratMSub)) %>% mutate(patient=con)
+  datList[[con]] <- dat_con
+}
+
+
+dat_all <- do.call("rbind", datList)
+
+#head(dat_all)
+
+patient_order <- c("Donor Heart 01", "Donor Heart 02", "Donor Heart 03", "Donor Heart 04", "Donor Heart 05", "Donor Heart 06", "Donor Heart 07", "Donor Heart 08", "Donor Heart 09", "Donor Heart 10", "Donor Heart 11", "Sarcoidosis 01", "Sarcoidosis 02", "Sarcoidosis 03", "Sarcoidosis 04", "Sarcoidosis 05")
+
+#View(dat_all)
+
+#write.table(dat_all, file= "~/Documents/01 Projects/00 snRNAseq/01 Myocarditis snRNAseq/docs/Markers", sep = "\t",quote=F,row.names=T,col.names=T)
+
+
+dat_all$patient <- factor(dat_all$patient, levels = patient_order)
+
+ggbarplot(dat_all, x= "patient", y= "percent", fill = "Var1", legend = "right", legend.titel = "cluster", ylab = "frequency", palette = colclusterName )  + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+```
+
+
+```{r}
+Idents(seuratM) <- seuratM$clusterName
+
+DEGenesClusters <- FindAllMarkers(seuratM, only.pos = T) %>%
+                            dplyr::filter(p_val_adj < 0.01)
+
+
+DEGenesClusters <- DEGenesClusters %>% 
+  mutate(Gene=gene) %>%
+  mutate(gene=gsub("^.*\\.", "", Gene))  %>%
+  mutate(EnsID=gsub("\\..*","", Gene))
+
+#View(DEGenesClusters)
+
+```
+
+
+## Feature Plots
+```{r}
+
+get_full_gene_name <- function(gene, obj){
+  return(grep(gene,rownames(obj), value =TRUE))
+}
+get_full_gene_name("CD3E",seuratM) 
+
+```
+
+
+```{r}
+
+FeaturePlot(seuratM, features = get_full_gene_name("CD3D",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratM, features = get_full_gene_name("CD3E",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratM, features = "ENSG00000168685.IL7R", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratM, features = "ENSG00000010610.CD4", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratM, features = "ENSG00000081237.PTPRC", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratM, features = "ENSG00000168685.IL7R", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratM, features = get_full_gene_name("CD79B",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratM, features = get_full_gene_name("JCHAIN",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratM, features = get_full_gene_name("IGHM",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))# B cells
+FeaturePlot(seuratM, features = "ENSG00000156738.MS4A1", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratM, features = get_full_gene_name("BLNK",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))# B cells
+FeaturePlot(seuratM, features = "ENSG00000057657.PRDM1", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratM, features = get_full_gene_name("IRF4",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))#
+#FeaturePlot(seuratM, features = get_full_gene_name("S100A9",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144")) 
+FeaturePlot(seuratM, features = "ENSG00000090339.ICAM1", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+
+FeaturePlot(seuratM, features = get_full_gene_name("HLA-DRB1",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))
+
+FeaturePlot(seuratM, features = "ENSG00000177575.CD163", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratM, features = "ENSG00000182578.CSF1R", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratM, features = get_full_gene_name("LYVE1",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))# 
+FeaturePlot(seuratM, features = get_full_gene_name("CSF1",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratM, features = "ENSG00000185591.SP1", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratM, features = get_full_gene_name("CD69",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratM, features = "ENSG00000185811.IKZF1", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratM, features = "ENSG00000139187.KLRG1", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratM, features = "ENSG00000110324.IL10RA", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratM, features = get_full_gene_name("CD69",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratM, features = "ENSG00000149591.TAGLN", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratM, features = "ENSG00000138755.CXCL9", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratM, features = "ENSG00000169245.CXCL10", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratM, features = get_full_gene_name("CXCL11",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratM, features = "ENSG00000137573.SULF1", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratM, features = "ENSG00000172673.THEMIS", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratM, features = get_full_gene_name("IFNGR1",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratM, features = get_full_gene_name("CSF1",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratM, features = "ENSG00000185591.SP1", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratM, features = get_full_gene_name("SEMA4A",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratM, features = get_full_gene_name("CLEC4A",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratM, features = get_full_gene_name("CLEC4A",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))
+
+```
+
+
+```{r}
+
+FeaturePlot(seuratM, features = "ENSG00000164692.COL1A2", pt.size = 1, cols = c("lightgrey", "#BE3144")) # Fibroblast
+FeaturePlot(seuratM, features = "ENSG00000142173.COL6A2", pt.size = 1, cols = c("lightgrey", "#BE3144")) # Fibroblast
+FeaturePlot(seuratM, features = "ENSG00000113721.PDGFRB", pt.size = 1, cols = c("lightgrey", "#BE3144")) # Fibroblast
+FeaturePlot(seuratM, features = get_full_gene_name("COL4A4",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratM, features = get_full_gene_name("FCGR1A",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratM, features = "ENSG00000107796.ACTA2", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratM, features = "ENSG00000135424.ITGA7", pt.size = 1, cols = c("lightgrey", "#BE3144")) # 
+FeaturePlot(seuratM, features = "ENSG00000143248.RGS5", pt.size = 1, cols = c("lightgrey", "#BE3144")) # Perivasc Fibroblast
+FeaturePlot(seuratM, features = "ENSG00000110799.VWF", pt.size = 1, cols = c("lightgrey", "#BE3144")) # ECs
+FeaturePlot(seuratM, features = "ENSG00000179776.CDH5", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratM, features = "ENSG00000174059.CD34", pt.size = 1, cols = c("lightgrey", "#BE3144")) # endothelial cells
+FeaturePlot(seuratM, features = "ENSG00000118194.TNNT2", pt.size = 1, cols = c("lightgrey", "#BE3144")) # cardiomyocyte
+FeaturePlot(seuratM, features = "ENSG00000078814.MYH7B", pt.size = 1, cols = c("lightgrey", "#BE3144")) # cardiomyocyte
+
+FeaturePlot(seuratM, features = "ENSG00000163110.PDLIM5", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+
+FeaturePlot(seuratM, features = get_full_gene_name("ACACB",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))#adipocytes
+FeaturePlot(seuratM, features = get_full_gene_name("PLIN1",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))#adipocytes
+FeaturePlot(seuratM, features = get_full_gene_name("GPAM",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))#adipocytes
+FeaturePlot(seuratM, features = get_full_gene_name("ITGA7",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratM, features = get_full_gene_name("ITGA1",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))
+
+FeaturePlot(seuratM, features = "ENSG00000011465.DCN", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+
+FeaturePlot(seuratM, features = "ENSG00000175084.DES", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratM, features = "ENSG00000133110.POSTN", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratM, features = "ENSG00000261371.PECAM1", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+
+```
+
+
+```{r }
+
+FeaturePlot(seuratM, features = get_full_gene_name("ACACB",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))#adipocytes
+FeaturePlot(seuratM, features = get_full_gene_name("PLIN1",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))#adipocytes
+FeaturePlot(seuratM, features = get_full_gene_name("GPAM",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))#adipocytes
+FeaturePlot(seuratM, features = get_full_gene_name("ITGA7",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratM, features = get_full_gene_name("ITGA1",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))
+
+FeaturePlot(seuratM, features = "ENSG00000011465.DCN", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+
+FeaturePlot(seuratM, features = "ENSG00000175084.DES", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratM, features = "ENSG00000133110.POSTN", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratM, features = "ENSG00000261371.PECAM1", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+#FeaturePlot(seuratM, features = get_full_gene_name("ITGA10",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))# BEC
+#FeaturePlot(seuratM, features = get_full_gene_name("CDH11",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))# BEC
+
+FeaturePlot(seuratM, features = "ENSG00000133392.MYH11", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratM, features = "ENSG00000107796.ACTA2", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+
+FeaturePlot(seuratM, features = get_full_gene_name("EGFL7",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))# EC BEC und LEC
+#FeaturePlot(seuratM, features = get_full_gene_name("CDH11",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))#endothelial cells
+FeaturePlot(seuratM, features = get_full_gene_name("CCL21",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))# 
+FeaturePlot(seuratM, features = get_full_gene_name("PROX1",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))# 
+FeaturePlot(seuratM, features = get_full_gene_name("FLT4",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))# LEC
+
+FeaturePlot(seuratM, features = "ENSG00000211592.IGKC", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratM, features = "ENSG00000078098.FAP", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+FeaturePlot(seuratM, features = "ENSG00000179915.NRXN1", pt.size = 1, cols = c("lightgrey", "#BE3144")) # neuron
+FeaturePlot(seuratM, features = "ENSG00000198910.L1CAM", pt.size = 1, cols = c("lightgrey", "#BE3144"))
+```
+
+
+```{r}
+## Baroreceptors: PIEZO1, TRPV2, and TRPM4,
+
+FeaturePlot(seuratM, features = get_full_gene_name("PIEZO1",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))# B cells
+FeaturePlot(seuratM, features = get_full_gene_name("TRPV2",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))# Plasma cells PRDM1 (Blimp-1)
+FeaturePlot(seuratM, features = get_full_gene_name("TRPM4",seuratM) , pt.size = 1, cols = c("lightgrey", "#BE3144"))# 
+
+```
+
+
+
+```{r}
+
+date()
+sessionInfo()
+
+```
+
